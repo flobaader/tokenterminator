@@ -10,6 +10,7 @@ from services.model_output_comparison import ModelOutputComparison
 from services.prompt_optimizer import prompt_optimizer   
 from services.prompt_trimmer import trim
 from services.token_tracker import TokenTracker
+from services.energy_calculator import EnergyCalculator
 import nltk
 
 #load OpenAI API key from .env
@@ -25,6 +26,9 @@ def get_comparison_service():
 
 def get_token_tracker():
     return TokenTracker()
+
+def get_energy_calculator():
+    return EnergyCalculator()
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -51,6 +55,7 @@ class AnalysisResponse(BaseModel):
     originalTokens: int
     optimizedTokens: int
     tokenSavings: int
+    energySavedWatts: float
 
 
 # Define request model
@@ -91,7 +96,8 @@ async def optimize_prompt(
 async def analyze(
                 req: AnalyzePromptRequest,
                   comparison_service: ModelOutputComparison = Depends(get_comparison_service),
-                  token_tracker: TokenTracker = Depends(get_token_tracker)):
+                  token_tracker: TokenTracker = Depends(get_token_tracker),
+                  energy_calculator: EnergyCalculator = Depends(get_energy_calculator)):
     # Calculate similarity
     similarity_score_cosine = comparison_service.calculate_similarity(req.originalAnswer, req.optimizedAnswer)
     similarity_score_gpt = comparison_service.gpt_similarity(req.originalPrompt, req.originalAnswer, req.optimizedAnswer)
@@ -101,13 +107,16 @@ async def analyze(
     optimized_tokens = token_tracker.count_tokens(req.optimizedPrompt)
     token_savings = token_tracker.optimized_tokens(req.originalPrompt, req.optimizedPrompt)
 
+    energy_saved_watts = energy_calculator.calculate_energy_saving(token_savings)
+
     response =AnalysisResponse(
         savedEnergy=15.2,  # Placeholder value
         similarityScoreCosine=similarity_score_cosine,
         similarityScoreGPT=similarity_score_gpt,
         originalTokens = original_tokens,
         optimizedTokens=optimized_tokens,
-        tokenSavings=token_savings
+        tokenSavings=token_savings,
+        energySavedWatts= energy_saved_watts
     )
     return response
 
