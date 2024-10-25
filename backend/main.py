@@ -87,7 +87,7 @@ async def analyze(
 
     response =AnalysisResponse(
         savedEnergy=15.2,  # Placeholder value
-        similarityScoreCosine=similarity_score_cosine,  # Placeholder value
+        similarityScoreCosine=similarity_score_cosine,
         similarityScoreGPT=similarity_score_gpt,
         optimizedTokens=50  # Placeholder value
     )
