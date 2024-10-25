@@ -30,23 +30,26 @@ class GreenGPTResponse(BaseModel):
     similarityScore: float  # Assume a similarity score (0 to 1)
     optimizedTokens: int
 
+# Define request model
+class PromptRequest(BaseModel):
+    prompt: str = "Example prompt"
+
 # Sample endpoint that returns the JSON
 @app.post("/optimize-prompt", response_model=GreenGPTResponse)
-async def optimize_prompt(prompt: Optional[str] = "Example prompt"):
+async def optimize_prompt(request: PromptRequest):
     # Placeholder logic for response (replace with actual processing)
     response = GreenGPTResponse(
-        optimizedPrompt="Optimized " + prompt,
+        optimizedPrompt="Optimized " + request.prompt,
         optimizedAnswer="This is an optimized answer.",
         originalAnswer="This is the original answer to compare.",
         savedEnergy=15.2,  # Placeholder value
         similarityScore=0.85,  # Placeholder value
         optimizedTokens=50  # Placeholder value
     )
-    print("test")
     return response
 
 
 # generate a test post endpoint
 @app.post("/test")
-async def test(text: Optional[str] = "Example text"):
-    return {"message": text}
+async def test(prompt: Optional[str] = "Example text"):
+    return {"message": prompt}
