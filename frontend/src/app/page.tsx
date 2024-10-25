@@ -99,8 +99,8 @@ export default function Home() {
     useState<GreenGPTResponse | null>(null);
   const [analysisResponse, setAnalysisResponse] =
     useState<AnalyzeResponse | null>(null);
-  const [showOptimized, setShowOptimized] = useState(false);
-  const [showOptimizedAnswer, setShowOptimizedAnswer] = useState(false);
+  const [showOptimized, setShowOptimized] = useState(true);
+  const [showOptimizedAnswer, setShowOptimizedAnswer] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
