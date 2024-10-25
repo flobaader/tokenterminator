@@ -75,7 +75,7 @@ class TextProcessor:
     def trim(
         self,
         text: str,
-        stemmer: Optional[str] = None,
+        stemmer: Optional[str] = "porter",
         remove_spaces: bool = True,
         remove_stopwords: bool = True,
         remove_punctuation: bool = True,
