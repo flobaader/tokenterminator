@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 interface PromptRequest {
   prompt: string;
@@ -31,6 +32,7 @@ interface AnalyzeResponse {
   savedEnergy: number;
   similarityScoreCosine: number;
   similarityScoreGPT: number;
+  originalTokens: number; // Add this line
   optimizedTokens: number;
 }
 
@@ -58,6 +60,37 @@ const analyzePrompt = async (
 
   if (!response.ok) throw new Error("Failed to analyze prompt");
   return response.json();
+};
+
+const getEnergySavedVisualization = (energySaved: number) => {
+  const hoursWith6WBulb = energySaved / 0.006; // 6W = 0.006kWh
+
+  if (energySaved === 0) {
+    return { emoji: "⏳", text: "0 hours saved" };
+  } else if (hoursWith6WBulb < 24) {
+    return {
+      emoji: "💡",
+      text: `${hoursWith6WBulb.toFixed(1)} hours of a 6W LED bulb`,
+    };
+  } else if (hoursWith6WBulb < 24 * 7) {
+    const days = hoursWith6WBulb / 24;
+    return {
+      emoji: "🏠",
+      text: `${days.toFixed(1)} days of powering a small home`,
+    };
+  } else if (hoursWith6WBulb < 24 * 30) {
+    const weeks = hoursWith6WBulb / (24 * 7);
+    return {
+      emoji: "🚗",
+      text: `${weeks.toFixed(1)} weeks of charging an electric car`,
+    };
+  } else {
+    const months = hoursWith6WBulb / (24 * 30);
+    return {
+      emoji: "🌬️",
+      text: `${months.toFixed(1)} months of a wind turbine's output`,
+    };
+  }
 };
 
 export default function Home() {
@@ -257,11 +290,23 @@ export default function Home() {
                     {isAnalyzing ? (
                       <Skeleton className="h-4 w-20" />
                     ) : (
-                      <p>{analysisResponse?.optimizedTokens || 0}</p>
+                      <p>
+                        {analysisResponse
+                          ? `${
+                              analysisResponse.originalTokens -
+                              analysisResponse.optimizedTokens
+                            } (${(
+                              ((analysisResponse.originalTokens -
+                                analysisResponse.optimizedTokens) /
+                                analysisResponse.originalTokens) *
+                              100
+                            ).toFixed(2)}%)`
+                          : "0 (0%)"}
+                      </p>
                     )}
                   </div>
                   <div>
-                    <h3 className="font-semibold">⚡ Energy Saved</h3>
+                    <h3 className="font-semibold"> Energy Saved</h3>
                     {isAnalyzing ? (
                       <Skeleton className="h-4 w-24" />
                     ) : (
@@ -320,6 +365,26 @@ export default function Home() {
                         </p>
                       </>
                     )}
+                  </div>
+
+                  {/* Energy Saved Visualization */}
+                  <div className="flex flex-col items-center justify-center mt-4 space-y-2">
+                    <span className="text-6xl">
+                      {isAnalyzing
+                        ? "⏳"
+                        : getEnergySavedVisualization(
+                            analysisResponse?.savedEnergy || 0
+                          ).emoji}
+                    </span>
+                    <p className="text-center">
+                      {isAnalyzing ? (
+                        <Skeleton className="h-4 w-32" />
+                      ) : (
+                        getEnergySavedVisualization(
+                          analysisResponse?.savedEnergy || 0
+                        ).text
+                      )}
+                    </p>
                   </div>
                 </div>
               </CardContent>
