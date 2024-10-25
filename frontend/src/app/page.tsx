@@ -26,6 +26,7 @@ interface GreenGPTResponse {
   optimizedPrompt: string;
   optimizedAnswer: string;
   originalAnswer: string;
+  cached: boolean;
 }
 
 interface AnalyzePromptRequest {
