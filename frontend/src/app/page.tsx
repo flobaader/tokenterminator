@@ -9,6 +9,13 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { examplePrompts } from "@/lib/utils";
 import Image from "next/image";
 
 interface PromptRequest {
@@ -29,7 +36,7 @@ interface AnalyzePromptRequest {
 }
 
 interface AnalyzeResponse {
-  savedEnergy: number;
+  energySavedWatts: number;
   similarityScoreCosine: number;
   similarityScoreGPT: number;
   originalTokens: number; // Add this line
@@ -63,32 +70,16 @@ const analyzePrompt = async (
 };
 
 const getEnergySavedVisualization = (energySaved: number) => {
-  const hoursWith6WBulb = energySaved / 0.006; // 6W = 0.006kWh
+  // Scale up by 1000 for visualization
+  const scaledEnergySaved = energySaved * 1000;
+  const hoursWith6WBulb = scaledEnergySaved / 6; // 6W = 0.006kWh
 
-  if (energySaved === 0) {
+  if (scaledEnergySaved === 0) {
     return { emoji: "⏳", text: "0 hours saved" };
-  } else if (hoursWith6WBulb < 24) {
+  } else {
     return {
       emoji: "💡",
       text: `${hoursWith6WBulb.toFixed(1)} hours of a 6W LED bulb`,
-    };
-  } else if (hoursWith6WBulb < 24 * 7) {
-    const days = hoursWith6WBulb / 24;
-    return {
-      emoji: "🏠",
-      text: `${days.toFixed(1)} days of powering a small home`,
-    };
-  } else if (hoursWith6WBulb < 24 * 30) {
-    const weeks = hoursWith6WBulb / (24 * 7);
-    return {
-      emoji: "🚗",
-      text: `${weeks.toFixed(1)} weeks of charging an electric car`,
-    };
-  } else {
-    const months = hoursWith6WBulb / (24 * 30);
-    return {
-      emoji: "🌬️",
-      text: `${months.toFixed(1)} months of a wind turbine's output`,
     };
   }
 };
@@ -134,6 +125,10 @@ export default function Home() {
     }
   };
 
+  const handleExampleSelect = (selectedPrompt: string) => {
+    setPrompt(selectedPrompt);
+  };
+
   const renderPrompt = () => {
     if (!showOptimized || !optimizationResponse) return prompt;
 
@@ -167,7 +162,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
       <header className="bg-white dark:bg-gray-800 shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -176,14 +171,29 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="flex gap-6">
-          <div className="w-2/3">
+      <main className="flex-grow w-full max-w-[1400px] mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-24">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="w-full lg:w-2/3">
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   <span>📝 Enter your prompt</span>
                   <div className="flex items-center space-x-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline">Example Prompts</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {examplePrompts.map((example, index) => (
+                          <DropdownMenuItem
+                            key={index}
+                            onClick={() => handleExampleSelect(example.prompt)}
+                          >
+                            {example.name}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <Switch
                       id="show-optimized"
                       checked={showOptimized}
@@ -202,14 +212,14 @@ export default function Home() {
                         {!showOptimized || !optimizationResponse ? (
                           <Textarea
                             id="prompt"
-                            placeholder="Enter your prompt here"
+                            placeholder="Enter your prompt here or select an example prompt"
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
-                            className="h-32 font-mono text-sm resize-none"
+                            className="h-48 font-mono text-sm resize-none"
                           />
                         ) : (
                           <div
-                            className="h-32 font-mono text-sm rounded-md border border-input bg-transparent px-3 py-2 shadow-sm overflow-auto"
+                            className="h-48 font-mono text-sm rounded-md border border-input bg-transparent px-3 py-2 shadow-sm overflow-auto"
                             style={{
                               lineHeight: "1.5rem",
                               whiteSpace: "pre-wrap",
@@ -278,7 +288,7 @@ export default function Home() {
             )}
           </div>
 
-          <div className="w-1/3">
+          <div className="w-full lg:w-1/3">
             <Card>
               <CardHeader>
                 <CardTitle>📊 Optimization Statistics</CardTitle>
@@ -311,7 +321,8 @@ export default function Home() {
                       <Skeleton className="h-4 w-24" />
                     ) : (
                       <p>
-                        {(analysisResponse?.savedEnergy || 0).toFixed(4)} Wh
+                        {(analysisResponse?.energySavedWatts || 0).toFixed(4)}{" "}
+                        Wh
                       </p>
                     )}
                   </div>
@@ -344,7 +355,9 @@ export default function Home() {
                     )}
                   </div>
                   <div>
-                    <h3 className="font-semibold">👥 Scaled for 100 Users</h3>
+                    <h3 className="font-semibold">
+                      👥 Scaled for 1000 Prompts
+                    </h3>
                     {isAnalyzing ? (
                       <>
                         <Skeleton className="h-4 w-32 mb-1" />
@@ -353,14 +366,16 @@ export default function Home() {
                     ) : (
                       <>
                         <p>
-                          Tokens:{" "}
-                          {(analysisResponse?.optimizedTokens || 0) * 100}
+                          Tokens saved:{" "}
+                          {((analysisResponse?.originalTokens || 0) -
+                            (analysisResponse?.optimizedTokens || 0)) *
+                            1000}
                         </p>
                         <p>
                           Energy:{" "}
-                          {((analysisResponse?.savedEnergy || 0) * 100).toFixed(
-                            2
-                          )}{" "}
+                          {(
+                            (analysisResponse?.energySavedWatts || 0) * 1000
+                          ).toFixed(2)}{" "}
                           Wh
                         </p>
                       </>
@@ -373,7 +388,7 @@ export default function Home() {
                       {isAnalyzing
                         ? "⏳"
                         : getEnergySavedVisualization(
-                            analysisResponse?.savedEnergy || 0
+                            analysisResponse?.energySavedWatts || 0
                           ).emoji}
                     </span>
                     <p className="text-center">
@@ -381,7 +396,7 @@ export default function Home() {
                         <Skeleton className="h-4 w-32" />
                       ) : (
                         getEnergySavedVisualization(
-                          analysisResponse?.savedEnergy || 0
+                          analysisResponse?.energySavedWatts || 0
                         ).text
                       )}
                     </p>
@@ -392,6 +407,27 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      <footer className="fixed bottom-0 left-0 right-0 bg-[#147B58] text-white py-4 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-4">
+              <Image
+                src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Boston_Consulting_Group_2020_logo.svg"
+                alt="Boston Consulting Group Logo"
+                width={100}
+                height={50}
+                objectFit="contain"
+              />
+              <span className="font-semibold">Boston Consulting Group</span>
+            </div>
+            <div className="text-sm">
+              © {new Date().getFullYear()} Boston Consulting Group. All rights
+              reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
 
       <Toaster />
     </div>
