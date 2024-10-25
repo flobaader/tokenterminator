@@ -127,21 +127,19 @@ async def analyze(
 
     if cache_result.cached:
         
-        optimized_tokens = token_tracker.count_tokens(req.originalPrompt)
+        original_tokens = token_tracker.count_tokens(req.originalPrompt)
+        optimized_tokens = 0
         token_savings = optimized_tokens
-        token_savings_percentage = 100.00
 
-        energy_saved_watts = energy_calculator.calculate_energy_saving(token_savings)
-        cost_saved_dollars = energy_calculator.calculate_cost_saving(token_savings)
+        energy_saved_watts = energy_calculator.calculate_energy_saving(original_tokens)
+        cost_saved_dollars = energy_calculator.calculate_cost_saving(original_tokens)
 
         # If a cached result is found, return it directly
         return AnalysisResponse(
             similarityScoreCosine=-1,
             similarityScoreGPT=-1,
-            originalTokens = optimized_tokens,
+            originalTokens = original_tokens,
             optimizedTokens=optimized_tokens,
-            tokenSavings=token_savings,
-            tokenSavingsPercentage=token_savings_percentage,
             energySavedWatts= energy_saved_watts,
             costSavedDollars= cost_saved_dollars
         )
@@ -153,8 +151,6 @@ async def analyze(
     # Calculate token counts and savings
     original_tokens = token_tracker.count_tokens(req.originalPrompt)
     optimized_tokens = token_tracker.count_tokens(req.optimizedPrompt)
-    token_savings = token_tracker.optimized_tokens(req.originalPrompt, req.optimizedPrompt)
-    token_savings_percentage = token_tracker.calculate_token_savings_percentage(req.originalPrompt, req.optimizedPrompt)
 
     # Calculate energy and cost savings
     energy_saved_watts = energy_calculator.calculate_energy_saving(token_savings)
@@ -165,8 +161,6 @@ async def analyze(
         similarityScoreGPT=similarity_score_gpt,
         originalTokens = original_tokens,
         optimizedTokens=optimized_tokens,
-        tokenSavings=token_savings,
-        tokenSavingsPercentage=token_savings_percentage,
         energySavedWatts= energy_saved_watts,
         costSavedDollars= cost_saved_dollars
     )
