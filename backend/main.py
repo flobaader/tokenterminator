@@ -25,12 +25,11 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://tokenterminator.deploy.selectcode.dev, http://localhost:3000"],
+    allow_origins=["https://tokenterminator.deploy.selectcode.dev", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
-
 
 # Define response model
 class GreenGPTResponse(BaseModel):
