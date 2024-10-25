@@ -120,7 +120,7 @@ Your response should follow this format:
                 if not (0 <= score <= 100):
                     raise ValueError(f"Score {score} is outside valid range [0, 100]")
                     
-                return score
+                return float(score/100)
                 
             except (ValueError, IndexError) as e:
                 print(f"Error extracting score: {str(e)}")

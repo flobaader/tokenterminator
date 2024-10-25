@@ -37,7 +37,8 @@ class GreenGPTResponse(BaseModel):
     optimizedAnswer: str
     originalAnswer: str
     savedEnergy: float  # Assume this is a percentage or a metric you've calculated
-    similarityScore: float  # Assume a similarity score (0 to 1)
+    similarityScoreCosine: float  # Assume a similarity score (0 to 1)
+    similarityScoreGPT: float
     optimizedTokens: int
 
 
