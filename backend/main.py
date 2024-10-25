@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from typing import Optional
 from services.llm_service import LLMInteractionService
@@ -36,12 +36,18 @@ class PromptRequest(BaseModel):
 
 # Sample endpoint that returns the JSON
 @app.post("/optimize-prompt", response_model=GreenGPTResponse)
-async def optimize_prompt(request: PromptRequest):
-    # Placeholder logic for response (replace with actual processing)
+async def optimize_prompt(
+    request: PromptRequest,
+    llm_service: LLMInteractionService = Depends(get_llm_service)  # Inject LLM service
+):
+    # Use LLMInteractionService to get the original answer
+    original_answer = llm_service.get_answer(request.prompt)
+    
+    # Placeholder logic for other response values (replace with actual processing)
     response = GreenGPTResponse(
         optimizedPrompt="Optimized " + request.prompt,
         optimizedAnswer="This is an optimized answer.",
-        originalAnswer="This is the original answer to compare.",
+        originalAnswer=original_answer,
         savedEnergy=15.2,  # Placeholder value
         similarityScore=0.85,  # Placeholder value
         optimizedTokens=50  # Placeholder value
