@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
-from services.prompt_trimmer import trim
+from services.prompt_trimmer import TextProcessor, trim
 from services.token_tracker import TokenTracker
 from services.energy_calculator import EnergyCalculator
 import nltk
@@ -28,7 +28,6 @@ def get_token_tracker():
 
 def get_energy_calculator():
     return EnergyCalculator()
-
 # Initialize the FastAPI app
 app = FastAPI()
 
@@ -77,7 +76,9 @@ async def optimize_prompt(
     llm_service: LLMInteractionService = Depends(get_llm_service)
     
 ):
-    trimmed_prompt = trim(request.prompt)
+    processor = TextProcessor()
+
+    trimmed_prompt = processor.trim(request.prompt)
     original_answer, optimized_answer = await asyncio.gather(
         llm_service.get_answer(request.prompt),
         llm_service.get_answer(trimmed_prompt)
