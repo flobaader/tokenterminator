@@ -136,6 +136,10 @@ async def analyze(
     cost_saved_dollars = energy_calculator.calculate_cost_saving(token_savings)
 
     if req.optimizedPrompt == "None":
+
+        energy_saved_watts = energy_calculator.calculate_energy_saving(original_tokens)
+        cost_saved_dollars = energy_calculator.calculate_cost_saving(original_tokens)
+
         return AnalysisResponse(
             similarityScoreCosine=0,
             similarityScoreGPT=0,
