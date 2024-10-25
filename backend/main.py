@@ -3,15 +3,20 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
+from services.llm_service.py import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
 
 #load OpenAI API key from .env
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
-#Inject Model Output Comparison Services
+#Inject Services
+def get_llm_service():
+    return LLMInteractionService(api_key=api_key)
+
 def get_comparison_service():
     return ModelOutputComparison()
+
 
 # Initialize the FastAPI app
 app = FastAPI()
