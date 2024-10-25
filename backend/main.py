@@ -47,7 +47,9 @@ class AnalysisResponse(BaseModel):
     savedEnergy: float  # Assume this is a percentage or a metric you've calculated
     similarityScoreCosine: float  # Assume a similarity score (0 to 1)
     similarityScoreGPT: float
+    originalTokens: int
     optimizedTokens: int
+    tokenSavings: int
 
 
 # Define request model
