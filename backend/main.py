@@ -3,14 +3,12 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
-from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
 from services.prompt_trimmer import TextProcessor
 from services.token_tracker import TokenTracker
 from services.energy_calculator import EnergyCalculator
-import nltk
 
 #load OpenAI API key from .env
 load_dotenv()
@@ -119,10 +117,3 @@ async def analyze(
         energySavedWatts= energy_saved_watts
     )
     return response
-
-
-# generate a test post endpoint
-@app.post("/test")
-async def test(prompt: PromptRequest):
-    optimized_prompt = trim(prompt.prompt)
-    return {"message": optimized_prompt}
