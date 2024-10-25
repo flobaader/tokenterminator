@@ -1,7 +1,13 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
 from services.model_output_comparison import ModelOutputComparison
+
+#load OpenAI API key from .env
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
 
 #Inject Model Output Comparison Services
 def get_comparison_service():
