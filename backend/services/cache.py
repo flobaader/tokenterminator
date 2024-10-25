@@ -58,13 +58,23 @@ class CacheService:
                 answer=self._cache[similar_key],
                 cached=True
             )
-
-        # If no similar query found, create new cache entry
-        self._cache[key] = f"New generated answer for: {key}"
-        self._embeddings[key] = self._compute_embedding(key)
-        logger.info(f"Stored new value in cache for key: {key}")
         
         return CacheResult(
-            answer=self._cache[key],
+            answer="None",
             cached=False
         )
+
+    def save_cache(self, query: str, answer: str) -> bool:
+        try:
+            # Compute embedding first to ensure it succeeds before saving
+            embedding = self._compute_embedding(query)  # Changed to query instead of answer
+            
+            # Save both cache and embedding if computation succeeds
+            self._cache[query] = answer
+            self._embeddings[query] = embedding
+            
+            logger.info(f"Successfully cached response for query: {query[:50]}...")  # Truncate long queries in logs
+            return True
+        except Exception as e:
+            logger.error(f"Failed to cache response: {str(e)}")
+            return False

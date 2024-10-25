@@ -61,7 +61,6 @@ class AnalysisResponse(BaseModel):
     costSavedDollars: float
     
 
-
 # Define request model
 class PromptRequest(BaseModel):
     prompt: str = "Example prompt"
@@ -105,6 +104,8 @@ async def optimize_prompt(
         llm_service.get_answer(request.prompt),
         llm_service.get_answer(trimmed_prompt)
     )
+
+    cache_service.save_cache(request.prompt, optimized_answer)
 
     response = GreenGPTResponse(
         optimizedPrompt= trimmed_prompt,
