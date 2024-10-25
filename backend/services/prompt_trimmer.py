@@ -80,7 +80,7 @@ class TextProcessor:
         remove_stopwords: bool = True,
         remove_punctuation: bool = True,
         remove_chunks: bool = True,
-        min_chunk_length: int = 5,
+        min_chunk_length: int = 15,
         min_chunk_occurrences: int = 2,
         keep_first_chunk: bool = True  # Keep the first occurrence of each chunk
     ) -> str:
