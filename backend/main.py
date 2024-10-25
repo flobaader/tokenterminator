@@ -7,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
 from services.prompt_trimmer import TextProcessor
-from services.prompt_trimmer2 import trim
 from services.token_tracker import TokenTracker
 from services.energy_calculator import EnergyCalculator
 from services.cache import CacheService
@@ -82,8 +81,9 @@ async def optimize_prompt(
     llm_service: LLMInteractionService = Depends(get_llm_service)
     
 ):
-    AI_COMPRESS = True
+    AI_COMPRESS = False
     if AI_COMPRESS:
+        from services.prompt_trimmer2 import trim
         trimmed_prompt = trim(request.prompt)
     else:
         processor = TextProcessor()
