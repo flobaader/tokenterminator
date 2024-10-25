@@ -121,6 +121,7 @@ async def analyze(
     
         # Check cache for existing analysis
     cache_result = await cache_service.check_cache(req.originalPrompt)
+    print(cache_result)
 
     if cache_result.cached:
         
