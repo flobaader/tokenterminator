@@ -10,10 +10,13 @@ from services.model_output_comparison import ModelOutputComparison
 from services.prompt_optimizer import prompt_optimizer   
 from services.prompt_trimmer import trim
 from services.token_tracker import TokenTracker
+import nltk
 
 #load OpenAI API key from .env
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
+
+nltk.download('punkt_tab')
 
 #Inject Services
 def get_llm_service():
