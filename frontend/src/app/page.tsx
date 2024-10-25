@@ -104,16 +104,33 @@ export default function Home() {
   const renderPrompt = () => {
     if (!showOptimized || !optimizationResponse) return prompt;
 
-    const originalWords = prompt.split(/\s+/);
-    const optimizedWords = optimizationResponse.optimizedPrompt.split(/\s+/);
-    return originalWords.map((word, index) => (
-      <span
-        key={index}
-        className={!optimizedWords.includes(word) ? "bg-red-300" : ""}
-      >
-        {word}{" "}
-      </span>
-    ));
+    const originalChars = prompt.split("");
+    const optimizedChars = optimizationResponse.optimizedPrompt.split("");
+    let optimizedIndex = 0;
+
+    return originalChars.map((char, index) => {
+      // If we have exhausted optimizedChars, mark remaining original chars as unmatched
+      if (optimizedIndex >= optimizedChars.length) {
+        return (
+          <span key={index} className="bg-red-300">
+            {char}
+          </span>
+        );
+      }
+
+      // If the current character in original matches the character in optimized, move ahead in both
+      if (char === optimizedChars[optimizedIndex]) {
+        optimizedIndex++; // Move to the next character in the optimized string
+        return <span key={index}>{char}</span>;
+      }
+
+      // If there's a mismatch (i.e., char not in optimized at the current index), mark it as missing
+      return (
+        <span key={index} className="bg-red-300">
+          {char}
+        </span>
+      );
+    });
   };
 
   return (
