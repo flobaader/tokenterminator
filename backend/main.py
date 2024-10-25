@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from typing import Optional
+from fastapi.middleware.cors import CORSMiddleware
 from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
 
@@ -21,6 +22,16 @@ def get_comparison_service():
 # Initialize the FastAPI app
 app = FastAPI()
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://tokenterminator.deploy.selectcode.dev, http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+
 # Define response model
 class GreenGPTResponse(BaseModel):
     optimizedPrompt: str
@@ -29,6 +40,7 @@ class GreenGPTResponse(BaseModel):
     savedEnergy: float  # Assume this is a percentage or a metric you've calculated
     similarityScore: float  # Assume a similarity score (0 to 1)
     optimizedTokens: int
+
 
 # Define request model
 class PromptRequest(BaseModel):
