@@ -114,9 +114,8 @@ async def analyze(
     return response
 
 
-
 # generate a test post endpoint
 @app.post("/test")
 async def test(prompt: PromptRequest):
-    optimized_prompt = await prompt_optimizer(prompt.prompt)
+    optimized_prompt = trim(prompt.prompt)
     return {"message": optimized_prompt}
