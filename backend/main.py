@@ -1,3 +1,4 @@
+import asyncio
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends
@@ -7,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
 from services.prompt_optimizer import prompt_optimizer   
+from services.prompt_trimmer import trim
 from services.token_tracker import TokenTracker
 
 #load OpenAI API key from .env
@@ -68,13 +70,15 @@ async def optimize_prompt(
     llm_service: LLMInteractionService = Depends(get_llm_service)
     
 ):
-    # Use LLMInteractionService to get the original answer
-    original_answer = await llm_service.get_answer(request.prompt)
-    optimized_answer = original_answer # for testing 
+    trimmed_prompt = trim(request.prompt)
+    original_answer, optimized_answer = await asyncio.gather(
+        llm_service.get_answer(request.prompt),
+        llm_service.get_answer()
+    )
 
     # Placeholder logic for other response values (replace with actual processing)
     response = GreenGPTResponse(
-        optimizedPrompt="Optimized " + request.prompt,
+        optimizedPrompt= trimmed_prompt,
         optimizedAnswer=optimized_answer,
         originalAnswer=original_answer
     )
