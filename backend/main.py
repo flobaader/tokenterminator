@@ -151,6 +151,8 @@ async def analyze(
     # Calculate token counts and savings
     original_tokens = token_tracker.count_tokens(req.originalPrompt)
     optimized_tokens = token_tracker.count_tokens(req.optimizedPrompt)
+    token_savings = token_tracker.optimized_tokens(req.originalPrompt, req.optimizedPrompt)
+    token_savings_percentage = token_tracker.calculate_token_savings_percentage(req.originalPrompt, req.optimizedPrompt)
 
     # Calculate energy and cost savings
     energy_saved_watts = energy_calculator.calculate_energy_saving(token_savings)
