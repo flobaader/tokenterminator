@@ -9,6 +9,7 @@ from services.model_output_comparison import ModelOutputComparison
 from services.prompt_trimmer import TextProcessor
 from services.token_tracker import TokenTracker
 from services.energy_calculator import EnergyCalculator
+from services.cache import CacheService
 
 #load OpenAI API key from .env
 load_dotenv()
@@ -26,6 +27,10 @@ def get_token_tracker():
 
 def get_energy_calculator():
     return EnergyCalculator()
+
+def get_cache_service():
+    return CacheService()
+
 # Initialize the FastAPI app
 app = FastAPI()
 
@@ -123,3 +128,12 @@ async def analyze(
         costSavedDollars= cost_saved_dollars
     )
     return response
+
+
+@app.post("/test")
+async def test_cache(
+    request: PromptRequest,
+    cache_service: CacheService = Depends(get_cache_service)
+):
+    result = cache_service.check_cache(request.prompt)
+    return {"querry": request.prompt, "answer": result.answer, "cached": result.cached}
