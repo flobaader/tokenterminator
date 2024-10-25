@@ -6,6 +6,7 @@ from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
+from services.prompt_optimizer import prompt_optimizer   
 
 #load OpenAI API key from .env
 load_dotenv()
@@ -76,5 +77,6 @@ async def optimize_prompt(
 
 # generate a test post endpoint
 @app.post("/test")
-async def test(prompt: Optional[str] = "Example text"):
-    return {"message": prompt}
+async def test(prompt: PromptRequest):
+    optimized_prompt = await prompt_optimizer(prompt.prompt)
+    return {"message": optimized_prompt}
