@@ -26,7 +26,7 @@ interface GreenGPTResponse {
   optimizedPrompt: string;
   optimizedAnswer: string;
   originalAnswer: string;
-  isCached: boolean; // Renamed from 'cached' to 'isCached'
+  isCached: boolean;
 }
 
 interface AnalyzePromptRequest {
@@ -399,15 +399,17 @@ export default function Home() {
                             analysisResponse?.energySavedWatts || 0
                           ).emoji}
                     </span>
-                    <p className="text-center">
-                      {isAnalyzing ? (
-                        <Skeleton className="h-4 w-32" />
-                      ) : (
-                        getEnergySavedVisualization(
-                          analysisResponse?.energySavedWatts || 0
-                        ).text
-                      )}
-                    </p>
+                    {isAnalyzing ? (
+                      <Skeleton className="h-4 w-32" />
+                    ) : (
+                      <span className="text-center">
+                        {
+                          getEnergySavedVisualization(
+                            analysisResponse?.energySavedWatts || 0
+                          ).text
+                        }
+                      </span>
+                    )}
                   </div>
                 </div>
               </CardContent>
