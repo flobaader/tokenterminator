@@ -50,18 +50,25 @@ class PromptRequest(BaseModel):
 @app.post("/optimize-prompt", response_model=GreenGPTResponse)
 async def optimize_prompt(
     request: PromptRequest,
-    llm_service: LLMInteractionService = Depends(get_llm_service)  # Inject LLM service
+    llm_service: LLMInteractionService = Depends(get_llm_service),  # Inject LLM service
+    comparison_service: ModelOutputComparison = Depends(get_comparison_service) # Inject Comparison service
 ):
     # Use LLMInteractionService to get the original answer
     original_answer = llm_service.get_answer(request.prompt)
+    optimized_answer = original_answer # for testing 
     
+    # Calculate similarity
+    similarity_score_cosine = comparison_service.calculate_similarity(original_answer, optimized_answer)
+    similarity_score_gpt = comparison_service.gpt_similarity(request.prompt, original_answer, optimized_answer)
+
     # Placeholder logic for other response values (replace with actual processing)
     response = GreenGPTResponse(
         optimizedPrompt="Optimized " + request.prompt,
-        optimizedAnswer="This is an optimized answer.",
+        optimizedAnswer=optimized_answer,
         originalAnswer=original_answer,
         savedEnergy=15.2,  # Placeholder value
-        similarityScore=0.85,  # Placeholder value
+        similarityScoreCosine=similarity_score_cosine,  # Placeholder value
+        similarityScoreGPT=similarity_score_gpt,
         optimizedTokens=50  # Placeholder value
     )
     return response
