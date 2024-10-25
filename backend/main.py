@@ -80,7 +80,7 @@ async def optimize_prompt(
     )
     return response
 
-@app.post("/analyze")
+@app.post("/analyze", response_model=AnalysisResponse)
 async def analyze(
                 req: AnalyzePromptRequest,
                   comparison_service: ModelOutputComparison = Depends(get_comparison_service),
