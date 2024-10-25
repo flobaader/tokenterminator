@@ -9,120 +9,72 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 
-// List of common English stopwords
-const stopwords = new Set([
-  "a",
-  "an",
-  "and",
-  "are",
-  "as",
-  "at",
-  "be",
-  "by",
-  "for",
-  "from",
-  "has",
-  "he",
-  "in",
-  "is",
-  "it",
-  "its",
-  "of",
-  "on",
-  "that",
-  "the",
-  "to",
-  "was",
-  "were",
-  "will",
-  "with",
-]);
+// Define types based on the OpenAPI schema
+interface PromptRequest {
+  prompt: string;
+}
 
-const removeStopwords = (
-  text: string
-): { optimized: string; removed: string[] } => {
-  const words = text.split(/\s+/);
-  const optimizedWords: string[] = [];
-  const removedWords: string[] = [];
-
-  words.forEach((word) => {
-    if (!stopwords.has(word.toLowerCase())) {
-      optimizedWords.push(word);
-    } else {
-      removedWords.push(word);
-    }
-  });
-
-  return {
-    optimized: optimizedWords.join(" "),
-    removed: removedWords,
-  };
-};
-
-// Mock API call function
-const mockApiCall = async (
-  prompt: string
-): Promise<{
-  response: string;
+interface GreenGPTResponse {
   optimizedPrompt: string;
-  tokensSaved: number;
-  whSaved: number;
-  removedWords: string[];
-}> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  const { optimized, removed } = removeStopwords(prompt);
-  const tokensSaved = removed.length;
-  const whSaved = tokensSaved * 0.0001; // Mock calculation
-  return {
-    response: `Mock response: ${optimized}`,
-    optimizedPrompt: optimized,
-    tokensSaved,
-    whSaved,
-    removedWords: removed,
-  };
+  optimizedAnswer: string;
+  originalAnswer: string;
+  savedEnergy: number;
+  similarityScore: number;
+  optimizedTokens: number;
+}
+
+// Function to call the backend API
+const optimizePrompt = async (prompt: string): Promise<GreenGPTResponse> => {
+  const response = await fetch(
+    "https://backend.tokenterminator.deploy.selectcode.dev/optimize-prompt",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to optimize prompt");
+  }
+
+  return response.json();
 };
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
-  const [response, setResponse] = useState("");
-  const [stats, setStats] = useState({ tokensSaved: 0, whSaved: 0 });
-  const [removedWords, setRemovedWords] = useState<string[]>([]);
+  const [response, setResponse] = useState<GreenGPTResponse | null>(null);
   const [showOptimized, setShowOptimized] = useState(false);
-
-  useEffect(() => {
-    if (showOptimized) {
-      const { removed } = removeStopwords(prompt);
-      setRemovedWords(removed);
-    }
-  }, [prompt, showOptimized]);
+  const [showOptimizedAnswer, setShowOptimizedAnswer] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     toast("Prompt submitted", {
-      description: "Your prompt has been sent to the LLM.",
+      description: "Your prompt is being optimized.",
     });
 
     try {
-      const result = await mockApiCall(prompt);
-      setResponse(result.response);
-      setStats({ tokensSaved: result.tokensSaved, whSaved: result.whSaved });
-      setRemovedWords(result.removedWords);
+      const result = await optimizePrompt(prompt);
+      setResponse(result);
     } catch (error) {
       console.error("Error calling API:", error);
       toast.error("Error", {
-        description: "Failed to get response from the LLM.",
+        description: "Failed to optimize the prompt.",
       });
     }
   };
 
   const renderPrompt = () => {
-    const words = prompt.split(/\s+/);
-    return words.map((word, index) => (
+    if (!showOptimized || !response) return prompt;
+
+    const originalWords = prompt.split(/\s+/);
+    const optimizedWords = response.optimizedPrompt.split(/\s+/);
+    return originalWords.map((word, index) => (
       <span
         key={index}
-        className={
-          showOptimized && removedWords.includes(word) ? "bg-red-300" : ""
-        }
+        className={!optimizedWords.includes(word) ? "bg-red-300" : ""}
       >
         {word}{" "}
       </span>
@@ -162,7 +114,7 @@ export default function Home() {
                     <div className="flex flex-col space-y-1.5">
                       <Label htmlFor="prompt">Prompt</Label>
                       <div className="relative">
-                        {!showOptimized ? (
+                        {!showOptimized || !response ? (
                           <Textarea
                             id="prompt"
                             placeholder="Enter your prompt here"
@@ -192,48 +144,78 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>🤖 LLM Response</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{response || "Response will appear here"}</p>
-              </CardContent>
-            </Card>
+            {response && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center">
+                    <span>🤖 LLM Response</span>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="show-optimized-answer"
+                        checked={showOptimizedAnswer}
+                        onCheckedChange={setShowOptimizedAnswer}
+                      />
+                      <Label htmlFor="show-optimized-answer">
+                        🔍 Show Optimized
+                      </Label>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold mb-2">
+                        {showOptimizedAnswer
+                          ? "Optimized Answer:"
+                          : "Original Answer:"}
+                      </h3>
+                      <Textarea
+                        value={
+                          showOptimizedAnswer
+                            ? response.optimizedAnswer
+                            : response.originalAnswer
+                        }
+                        readOnly
+                        className="h-32 font-mono text-sm resize-none"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           <div className="w-1/3">
-            <Card>
-              <CardHeader>
-                <CardTitle>📊 Optimization Statistics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold">🎟️ Tokens Saved</h3>
-                    <p>
-                      {stats.tokensSaved} (
-                      {prompt.length > 0
-                        ? (
-                            (stats.tokensSaved / prompt.split(/\s+/).length) *
-                            100
-                          ).toFixed(2)
-                        : 0}
-                      %)
-                    </p>
+            {response && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>📊 Optimization Statistics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold">🎟️ Tokens Saved</h3>
+                      <p>{response.optimizedTokens}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">⚡ Energy Saved</h3>
+                      <p>{response.savedEnergy.toFixed(4)} Wh</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">🎯 Similarity Score</h3>
+                      <p>{(response.similarityScore * 100).toFixed(2)}%</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">👥 Scaled for 100 Users</h3>
+                      <p>Tokens: {response.optimizedTokens * 100}</p>
+                      <p>
+                        Energy: {(response.savedEnergy * 100).toFixed(2)} Wh
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold">⚡ Watt-hours Saved</h3>
-                    <p>{stats.whSaved.toFixed(4)} Wh</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">👥 Scaled for 100 Users</h3>
-                    <p>Tokens: {stats.tokensSaved * 100}</p>
-                    <p>Watt-hours: {(stats.whSaved * 100).toFixed(2)} Wh</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>
