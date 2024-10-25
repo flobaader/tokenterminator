@@ -16,8 +16,6 @@ import nltk
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
-nltk.download('punkt_tab')
-
 #Inject Services
 def get_llm_service():
     return LLMInteractionService(api_key=api_key)
