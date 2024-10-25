@@ -48,7 +48,7 @@ class CacheService:
 
         return most_similar_key, max_similarity
 
-    def check_cache(self, key: str) -> CacheResult:
+    async def check_cache(self, key: str) -> CacheResult:
         # First, try to find a semantically similar query
         similar_key, similarity = self._find_similar_query(key)
         

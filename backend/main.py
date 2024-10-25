@@ -48,6 +48,7 @@ class GreenGPTResponse(BaseModel):
     optimizedPrompt: str
     optimizedAnswer: str
     originalAnswer: str
+    isCached: bool = False
 
 class AnalysisResponse(BaseModel):
     similarityScoreCosine: float  # Assume a similarity score (0 to 1)
@@ -78,9 +79,19 @@ class AnalyzePromptRequest(BaseModel):
 @app.post("/optimize-prompt", response_model=GreenGPTResponse)
 async def optimize_prompt(
     request: PromptRequest,
-    llm_service: LLMInteractionService = Depends(get_llm_service)
-    
+    llm_service: LLMInteractionService = Depends(get_llm_service),
+    cache_service: CacheService = Depends(get_cache_service)
 ):
+    result = await cache_service.check_cache(request.prompt)
+    if result.cached:
+        response = GreenGPTResponse(
+        optimizedPrompt= "None",
+        optimizedAnswer= result.answer,
+        originalAnswer= "None",
+        isCached = True
+        )
+        return response
+    
     AI_COMPRESS = False
     if AI_COMPRESS:
         from services.prompt_trimmer2 import trim
@@ -95,11 +106,11 @@ async def optimize_prompt(
         llm_service.get_answer(trimmed_prompt)
     )
 
-    # Placeholder logic for other response values (replace with actual processing)
     response = GreenGPTResponse(
         optimizedPrompt= trimmed_prompt,
         optimizedAnswer=optimized_answer,
-        originalAnswer=original_answer
+        originalAnswer=original_answer,
+        isCached = False
     )
     return response
 
@@ -141,5 +152,5 @@ async def test_cache(
     request: PromptRequest,
     cache_service: CacheService = Depends(get_cache_service)
 ):
-    result = cache_service.check_cache(request.prompt)
+    result = await cache_service.check_cache(request.prompt)
     return {"querry": request.prompt, "answer": result.answer, "cached": result.cached}
