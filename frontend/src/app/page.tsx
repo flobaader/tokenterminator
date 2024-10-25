@@ -70,8 +70,8 @@ const analyzePrompt = async (
 };
 
 const getEnergySavedVisualization = (energySaved: number) => {
-  // Scale up by 1000 for visualization
-  const scaledEnergySaved = energySaved * 1000;
+  // Scale up by 10000 for visualization
+  const scaledEnergySaved = energySaved * 10000;
   const hoursWith6WBulb = scaledEnergySaved / 6; // 6W = 0.006kWh
 
   if (scaledEnergySaved === 0) {
@@ -356,7 +356,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="font-semibold">
-                      👥 Scaled for 1000 Prompts
+                      👥 Scaled for 10000 Prompts
                     </h3>
                     {isAnalyzing ? (
                       <>
@@ -369,12 +369,12 @@ export default function Home() {
                           Tokens saved:{" "}
                           {((analysisResponse?.originalTokens || 0) -
                             (analysisResponse?.optimizedTokens || 0)) *
-                            1000}
+                            10000}
                         </p>
                         <p>
                           Energy:{" "}
                           {(
-                            (analysisResponse?.energySavedWatts || 0) * 1000
+                            (analysisResponse?.energySavedWatts || 0) * 10000
                           ).toFixed(2)}{" "}
                           Wh
                         </p>
