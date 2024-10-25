@@ -26,7 +26,7 @@ class GreenGPTResponse(BaseModel):
     optimizedTokens: int
 
 # Sample endpoint that returns the JSON
-@app.get("/optimize-prompt", response_model=GreenGPTResponse)
+@app.post("/optimize-prompt", response_model=GreenGPTResponse)
 async def optimize_prompt(prompt: Optional[str] = "Example prompt"):
     # Placeholder logic for response (replace with actual processing)
     response = GreenGPTResponse(
@@ -37,5 +37,6 @@ async def optimize_prompt(prompt: Optional[str] = "Example prompt"):
         similarityScore=0.85,  # Placeholder value
         optimizedTokens=50  # Placeholder value
     )
+    print("test")
     return response
 
