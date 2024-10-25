@@ -52,6 +52,7 @@ class AnalysisResponse(BaseModel):
     optimizedTokens: int
     tokenSavings: int
     energySavedWatts: float
+    costSavedDollars: float
 
 
 # Define request model
@@ -105,7 +106,9 @@ async def analyze(
     optimized_tokens = token_tracker.count_tokens(req.optimizedPrompt)
     token_savings = token_tracker.optimized_tokens(req.originalPrompt, req.optimizedPrompt)
 
+    # Calculate energy and cost savings
     energy_saved_watts = energy_calculator.calculate_energy_saving(token_savings)
+    cost_saved_dollars = energy_calculator.calculate_cost_saving(token_savings)
 
     response =AnalysisResponse(
         savedEnergy=15.2,  # Placeholder value
@@ -114,6 +117,7 @@ async def analyze(
         originalTokens = original_tokens,
         optimizedTokens=optimized_tokens,
         tokenSavings=token_savings,
-        energySavedWatts= energy_saved_watts
+        energySavedWatts= energy_saved_watts,
+        costSavedDollars= cost_saved_dollars
     )
     return response
