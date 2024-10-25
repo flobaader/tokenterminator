@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
 from services.prompt_optimizer import prompt_optimizer   
+from services.token_tracker import TokenTracker
 
 #load OpenAI API key from .env
 load_dotenv()
@@ -19,6 +20,8 @@ def get_llm_service():
 def get_comparison_service():
     return ModelOutputComparison()
 
+def get_token_tracker():
+    return TokenTracker()
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -80,16 +83,25 @@ async def optimize_prompt(
 @app.post("/analyze")
 async def analyze(
                 req: AnalyzePromptRequest,
-                  comparison_service: ModelOutputComparison = Depends(get_comparison_service)):
+                  comparison_service: ModelOutputComparison = Depends(get_comparison_service),
+                  token_tracker: TokenTracker = Depends(get_token_tracker)):
     # Calculate similarity
     similarity_score_cosine = comparison_service.calculate_similarity(req.original_answer, req.optimized_answer)
     similarity_score_gpt = comparison_service.gpt_similarity(req.prompt, req.original_answer, req.optimized_answer)
+
+    # Calculate token counts and savings
+    original_tokens = token_tracker.count_tokens(req.originalPrompt)
+    optimized_tokens = token_tracker.count_tokens(req.optimizedPrompt)
+    token_savings = token_tracker.optimized_tokens(req.originalPrompt, req.optimizedPrompt)
+
 
     response =AnalysisResponse(
         savedEnergy=15.2,  # Placeholder value
         similarityScoreCosine=similarity_score_cosine,
         similarityScoreGPT=similarity_score_gpt,
-        optimizedTokens=50  # Placeholder value
+        originalTokens = original_tokens,
+        optimizedTokens=optimized_tokens,
+        tokenSavings=token_savings
     )
     return response
 
