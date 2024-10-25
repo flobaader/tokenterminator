@@ -73,7 +73,7 @@ async def optimize_prompt(
     trimmed_prompt = trim(request.prompt)
     original_answer, optimized_answer = await asyncio.gather(
         llm_service.get_answer(request.prompt),
-        llm_service.get_answer()
+        llm_service.get_answer(trimmed_prompt)
     )
 
     # Placeholder logic for other response values (replace with actual processing)
