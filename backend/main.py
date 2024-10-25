@@ -120,9 +120,9 @@ async def analyze(
                 req: AnalyzePromptRequest,
                   comparison_service: ModelOutputComparison = Depends(get_comparison_service),
                   token_tracker: TokenTracker = Depends(get_token_tracker),
-                  energy_calculator: EnergyCalculator = Depends(get_energy_calculator),
-                  cache_service: CacheService = Depends(get_cache_service)):
+                  energy_calculator: EnergyCalculator = Depends(get_energy_calculator)):
     
+
     # Calculate similarity
     similarity_score_cosine = comparison_service.calculate_similarity(req.originalAnswer, req.optimizedAnswer)
     similarity_score_gpt = comparison_service.gpt_similarity(req.originalPrompt, req.originalAnswer, req.optimizedAnswer)
@@ -134,6 +134,18 @@ async def analyze(
     # Calculate energy and cost savings
     energy_saved_watts = energy_calculator.calculate_energy_saving(token_savings)
     cost_saved_dollars = energy_calculator.calculate_cost_saving(token_savings)
+
+    if req.optimizedPrompt == "None":
+        return AnalysisResponse(
+            similarityScoreCosine=0,
+            similarityScoreGPT=0,
+            originalTokens=original_tokens,
+            optimizedTokens=0,
+            tokenSavings=token_savings,
+            tokenSavingsPercentage=token_savings_percentage,
+            energySavedWatts=energy_saved_watts,
+            costSavedDollars=cost_saved_dollars
+        ) 
 
     response = AnalysisResponse(
         similarityScoreCosine=similarity_score_cosine,
