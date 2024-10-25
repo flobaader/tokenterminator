@@ -1,16 +1,16 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 
 class LLMInteractionService:
     def __init__(self, api_key: str):
-        self.client = OpenAI(
+        self.client = AsyncOpenAI(
             # This is the default and can be omitted
             api_key=api_key,
         )
 
-    def get_answer(self, prompt: str) -> str:
+    async def get_answer(self, prompt: str) -> str:
         # Create chat completion request
-        response = self.client.chat.completions.create(
+        response = await self.client.chat.completions.create(
             messages=[
                 {
                     "role": "user",

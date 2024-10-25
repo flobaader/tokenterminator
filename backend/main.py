@@ -69,7 +69,7 @@ async def optimize_prompt(
     
 ):
     # Use LLMInteractionService to get the original answer
-    original_answer = llm_service.get_answer(request.prompt)
+    original_answer = await llm_service.get_answer(request.prompt)
     optimized_answer = original_answer # for testing 
 
     # Placeholder logic for other response values (replace with actual processing)
@@ -86,14 +86,13 @@ async def analyze(
                   comparison_service: ModelOutputComparison = Depends(get_comparison_service),
                   token_tracker: TokenTracker = Depends(get_token_tracker)):
     # Calculate similarity
-    similarity_score_cosine = comparison_service.calculate_similarity(req.original_answer, req.optimized_answer)
-    similarity_score_gpt = comparison_service.gpt_similarity(req.prompt, req.original_answer, req.optimized_answer)
+    similarity_score_cosine = comparison_service.calculate_similarity(req.originalAnswer, req.optimizedAnswer)
+    similarity_score_gpt = comparison_service.gpt_similarity(req.prompt, req.originalAnswer, req.optimizedAnswer)
 
     # Calculate token counts and savings
     original_tokens = token_tracker.count_tokens(req.originalPrompt)
     optimized_tokens = token_tracker.count_tokens(req.optimizedPrompt)
     token_savings = token_tracker.optimized_tokens(req.originalPrompt, req.optimizedPrompt)
-
 
     response =AnalysisResponse(
         savedEnergy=15.2,  # Placeholder value
