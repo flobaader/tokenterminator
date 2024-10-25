@@ -55,6 +55,8 @@ class AnalysisResponse(BaseModel):
     similarityScoreGPT: float
     originalTokens: int
     optimizedTokens: int
+    tokenSavings: int
+    tokenSavingsPercentage: float
     energySavedWatts: float
     costSavedDollars: float
     
@@ -121,39 +123,14 @@ async def analyze(
                   energy_calculator: EnergyCalculator = Depends(get_energy_calculator),
                   cache_service: CacheService = Depends(get_cache_service)):
     
-    # Check cache for existing analysis
-    '''
-    cache_result = await cache_service.check_cache(req.originalPrompt)
-
-    if cache_result.cached:
-        
-        original_tokens = token_tracker.count_tokens(req.originalPrompt)
-        optimized_tokens = 0
-        token_savings = optimized_tokens
-
-        energy_saved_watts = energy_calculator.calculate_energy_saving(original_tokens)
-        cost_saved_dollars = energy_calculator.calculate_cost_saving(original_tokens)
-
-        # If a cached result is found, return it directly
-        return AnalysisResponse(
-            similarityScoreCosine=-1,
-            similarityScoreGPT=-1,
-            originalTokens = original_tokens,
-            optimizedTokens=optimized_tokens,
-            energySavedWatts= energy_saved_watts,
-            costSavedDollars= cost_saved_dollars
-        )
-    '''
     # Calculate similarity
     similarity_score_cosine = comparison_service.calculate_similarity(req.originalAnswer, req.optimizedAnswer)
     similarity_score_gpt = comparison_service.gpt_similarity(req.originalPrompt, req.originalAnswer, req.optimizedAnswer)
-
     # Calculate token counts and savings
     original_tokens = token_tracker.count_tokens(req.originalPrompt)
     optimized_tokens = token_tracker.count_tokens(req.optimizedPrompt)
     token_savings = token_tracker.optimized_tokens(req.originalPrompt, req.optimizedPrompt)
     token_savings_percentage = token_tracker.calculate_token_savings_percentage(req.originalPrompt, req.optimizedPrompt)
-
     # Calculate energy and cost savings
     energy_saved_watts = energy_calculator.calculate_energy_saving(token_savings)
     cost_saved_dollars = energy_calculator.calculate_cost_saving(token_savings)
@@ -161,12 +138,15 @@ async def analyze(
     response = AnalysisResponse(
         similarityScoreCosine=similarity_score_cosine,
         similarityScoreGPT=similarity_score_gpt,
-        originalTokens = original_tokens,
+        originalTokens=original_tokens,
         optimizedTokens=optimized_tokens,
-        energySavedWatts= energy_saved_watts,
-        costSavedDollars= cost_saved_dollars
+        tokenSavings=token_savings,
+        tokenSavingsPercentage=token_savings_percentage,
+        energySavedWatts=energy_saved_watts,
+        costSavedDollars=cost_saved_dollars
     )
     return response
+
 
 
 @app.post("/test")
