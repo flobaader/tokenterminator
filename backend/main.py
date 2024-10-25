@@ -173,4 +173,15 @@ async def test_cache(
     cache_service: CacheService = Depends(get_cache_service)
 ):
     result = await cache_service.check_cache(request.prompt)
+    test_answer = f"This is a test answer for: {request.prompt}"
+    cache_service.save_cache(request.prompt, test_answer)
+    
     return {"querry": request.prompt, "answer": result.answer, "cached": result.cached}
+
+@app.delete("/cache")
+async def delete_cache(
+    cache_service: CacheService = Depends(get_cache_service)
+):
+    """Delete all entries from the cache"""
+    cache_service.clear_cache()
+    return {"message": "Cache cleared successfully"}

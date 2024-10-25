@@ -78,3 +78,8 @@ class CacheService:
         except Exception as e:
             logger.error(f"Failed to cache response: {str(e)}")
             return False
+
+    def clear_cache(self):
+        """Clear all entries from the cache"""
+        self._cache = {}
+        self._embeddings = {}
