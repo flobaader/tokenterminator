@@ -55,8 +55,8 @@ class AnalysisResponse(BaseModel):
     similarityScoreGPT: float
     originalTokens: int
     optimizedTokens: int
-    tokenSavings: int
-    tokenSavingsPercentage: float
+   # tokenSavings: int
+   # tokenSavingsPercentage: float
     energySavedWatts: float
     costSavedDollars: float
     
