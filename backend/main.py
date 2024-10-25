@@ -55,8 +55,6 @@ class AnalysisResponse(BaseModel):
     similarityScoreGPT: float
     originalTokens: int
     optimizedTokens: int
-   # tokenSavings: int
-   # tokenSavingsPercentage: float
     energySavedWatts: float
     costSavedDollars: float
     
@@ -123,8 +121,9 @@ async def analyze(
                   energy_calculator: EnergyCalculator = Depends(get_energy_calculator),
                   cache_service: CacheService = Depends(get_cache_service)):
     
-        # Check cache for existing analysis
-    cache_result = cache_service.check_cache(req.originalPrompt)
+    # Check cache for existing analysis
+    '''
+    cache_result = await cache_service.check_cache(req.originalPrompt)
 
     if cache_result.cached:
         
@@ -144,7 +143,7 @@ async def analyze(
             energySavedWatts= energy_saved_watts,
             costSavedDollars= cost_saved_dollars
         )
-    
+    '''
     # Calculate similarity
     similarity_score_cosine = comparison_service.calculate_similarity(req.originalAnswer, req.optimizedAnswer)
     similarity_score_gpt = comparison_service.gpt_similarity(req.originalPrompt, req.originalAnswer, req.optimizedAnswer)

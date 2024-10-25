@@ -26,7 +26,7 @@ interface GreenGPTResponse {
   optimizedPrompt: string;
   optimizedAnswer: string;
   originalAnswer: string;
-  cached: boolean;
+  isCached: boolean;
 }
 
 interface AnalyzePromptRequest {
@@ -54,7 +54,7 @@ const optimizePrompt = async (prompt: string): Promise<GreenGPTResponse> => {
   });
 
   if (!response.ok) throw new Error("Failed to optimize prompt");
-  return response.json();
+  return response.json(); // Remove the mocking, use the actual response
 };
 
 const analyzePrompt = async (
@@ -248,7 +248,14 @@ export default function Home() {
               <Card className="mb-6">
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center">
-                    <span>🤖 LLM Response</span>
+                    <div className="flex items-center">
+                      <span>🤖 LLM Response</span>
+                      {optimizationResponse?.isCached && ( // Changed from 'cached' to 'isCached'
+                        <span className="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-[#147B58] text-white">
+                          Cached
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="show-optimized-answer"
@@ -392,15 +399,17 @@ export default function Home() {
                             analysisResponse?.energySavedWatts || 0
                           ).emoji}
                     </span>
-                    <p className="text-center">
-                      {isAnalyzing ? (
-                        <Skeleton className="h-4 w-32" />
-                      ) : (
-                        getEnergySavedVisualization(
-                          analysisResponse?.energySavedWatts || 0
-                        ).text
-                      )}
-                    </p>
+                    {isAnalyzing ? (
+                      <Skeleton className="h-4 w-32" />
+                    ) : (
+                      <span className="text-center">
+                        {
+                          getEnergySavedVisualization(
+                            analysisResponse?.energySavedWatts || 0
+                          ).text
+                        }
+                      </span>
+                    )}
                   </div>
                 </div>
               </CardContent>
