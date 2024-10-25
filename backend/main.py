@@ -45,7 +45,6 @@ class GreenGPTResponse(BaseModel):
     originalAnswer: str
 
 class AnalysisResponse(BaseModel):
-    savedEnergy: float  # Assume this is a percentage or a metric you've calculated
     similarityScoreCosine: float  # Assume a similarity score (0 to 1)
     similarityScoreGPT: float
     originalTokens: int
@@ -111,7 +110,6 @@ async def analyze(
     cost_saved_dollars = energy_calculator.calculate_cost_saving(token_savings)
 
     response =AnalysisResponse(
-        savedEnergy=15.2,  # Placeholder value
         similarityScoreCosine=similarity_score_cosine,
         similarityScoreGPT=similarity_score_gpt,
         originalTokens = original_tokens,
