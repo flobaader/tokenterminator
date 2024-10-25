@@ -7,7 +7,6 @@ from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
-from services.prompt_optimizer import prompt_optimizer   
 from services.prompt_trimmer import trim
 from services.token_tracker import TokenTracker
 from services.energy_calculator import EnergyCalculator

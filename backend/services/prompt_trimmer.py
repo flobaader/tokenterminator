@@ -1,7 +1,5 @@
 import re
-from typing import Optional, List, Tuple, Dict
-import time
-from collections import defaultdict
+from typing import Optional, List, Tuple
 
 import nltk
 from nltk.corpus import stopwords
