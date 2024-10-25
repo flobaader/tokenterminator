@@ -37,6 +37,8 @@ class GreenGPTResponse(BaseModel):
     optimizedPrompt: str
     optimizedAnswer: str
     originalAnswer: str
+
+class AnalysisResponse(BaseModel):
     savedEnergy: float  # Assume this is a percentage or a metric you've calculated
     similarityScoreCosine: float  # Assume a similarity score (0 to 1)
     similarityScoreGPT: float
@@ -47,32 +49,50 @@ class GreenGPTResponse(BaseModel):
 class PromptRequest(BaseModel):
     prompt: str = "Example prompt"
 
+
+# Define request model
+class AnalyzePromptRequest(BaseModel):
+    originalPrompt: str = "Example prompt"
+    optimizedPrompt: str = "Optimzed prompt"
+    originalAnswer: str = "Original Answer"
+    optimizedAnswer: str = "Optimized Answer"
+    
+
 # Sample endpoint that returns the JSON
 @app.post("/optimize-prompt", response_model=GreenGPTResponse)
 async def optimize_prompt(
     request: PromptRequest,
-    llm_service: LLMInteractionService = Depends(get_llm_service),  # Inject LLM service
-    comparison_service: ModelOutputComparison = Depends(get_comparison_service) # Inject Comparison service
+    llm_service: LLMInteractionService = Depends(get_llm_service)
+    
 ):
     # Use LLMInteractionService to get the original answer
     original_answer = llm_service.get_answer(request.prompt)
     optimized_answer = original_answer # for testing 
-    
-    # Calculate similarity
-    similarity_score_cosine = comparison_service.calculate_similarity(original_answer, optimized_answer)
-    similarity_score_gpt = comparison_service.gpt_similarity(request.prompt, original_answer, optimized_answer)
 
     # Placeholder logic for other response values (replace with actual processing)
     response = GreenGPTResponse(
         optimizedPrompt="Optimized " + request.prompt,
         optimizedAnswer=optimized_answer,
-        originalAnswer=original_answer,
+        originalAnswer=original_answer
+    )
+    return response
+
+@app.post("/analyze")
+async def analyze(
+                req: AnalyzePromptRequest,
+                  comparison_service: ModelOutputComparison = Depends(get_comparison_service)):
+    # Calculate similarity
+    similarity_score_cosine = comparison_service.calculate_similarity(req.original_answer, req.optimized_answer)
+    similarity_score_gpt = comparison_service.gpt_similarity(req.prompt, req.original_answer, req.optimized_answer)
+
+    response =AnalysisResponse(
         savedEnergy=15.2,  # Placeholder value
         similarityScoreCosine=similarity_score_cosine,  # Placeholder value
         similarityScoreGPT=similarity_score_gpt,
         optimizedTokens=50  # Placeholder value
     )
     return response
+
 
 
 # generate a test post endpoint
