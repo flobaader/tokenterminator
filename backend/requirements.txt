@@ -4,4 +4,4 @@ scikit-learn
 sentence-transformers
 python-dotenv
 openai
-
+nltk
