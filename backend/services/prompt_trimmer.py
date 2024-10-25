@@ -57,10 +57,10 @@ class SuffixArray:
             if k > 0:
                 k -= 1
         return lcp
-
+    
 class TextProcessor:
     """
-    Enhanced text processor with trimming and repeated chunk detection capabilities
+    Enhanced text processor with trimming and integrated chunk removal
     """
     def __init__(self, language: str = "english"):
         self.language = language
@@ -78,20 +78,51 @@ class TextProcessor:
         stemmer: Optional[str] = None,
         remove_spaces: bool = True,
         remove_stopwords: bool = True,
-        remove_punctuation: bool = False
+        remove_punctuation: bool = True,
+        remove_chunks: bool = True,
+        min_chunk_length: int = 5,
+        min_chunk_occurrences: int = 2,
+        keep_first_chunk: bool = True  # Keep the first occurrence of each chunk
     ) -> str:
-        """
-        Trim and process text according to specified parameters
-        """
         accepted_stemmers = ("snowball", "porter", "lancaster")
         if stemmer and stemmer not in accepted_stemmers:
             raise ValueError("Stemmer must be one of", accepted_stemmers)
 
-        # merge contractions
+        # Merge contractions early
         text = text.replace("'", "").replace("'", "")
 
-        # tokenize words, keep uppercase
-        tokenized = nltk.word_tokenize(text)
+        # First pass: identify sentence boundaries and chunks
+        sentences = nltk.sent_tokenize(text)
+        processed_text = text
+
+        # Remove repeated chunks if requested
+        if remove_chunks:
+            # Find all repeated chunks
+            chunks = self.find_repeated_chunks(
+                processed_text,
+                min_length=min_chunk_length,
+                min_occurrences=min_chunk_occurrences
+            )
+            
+            # Filter out overlapping chunks
+            non_overlapping_chunks = self.find_non_overlapping_chunks(chunks)
+            
+            # Sort chunks by position (reversed) to remove from end to start
+            for chunk, positions, _ in sorted(non_overlapping_chunks, 
+                                           key=lambda x: (-x[1][0], -len(x[0]))):
+                # Skip the first occurrence if keep_first_chunk is True
+                chunk_positions = positions[1:] if keep_first_chunk else positions
+                
+                # Remove chunks from end to start to maintain position accuracy
+                for pos in sorted(chunk_positions, reverse=True):
+                    processed_text = (
+                        processed_text[:pos] + 
+                        " " +  # Add space to prevent word joining
+                        processed_text[pos + len(chunk):]
+                    )
+
+        # Tokenize words after chunk removal
+        tokenized = nltk.word_tokenize(processed_text)
 
         if remove_punctuation:
             tokenized = [word for word in tokenized if word not in PUNCTUATION]
@@ -101,17 +132,21 @@ class TextProcessor:
 
         words = tokenized
 
+        # Apply stemming if requested
         if stemmer:
             stemmer_instance = self._get_stemmer(stemmer)
             words = [stemmer_instance.stem(word) for word in tokenized]
             words = self._restore_case(words, tokenized)
 
-        # remove spaces
+        # Join words
         join_str = "" if remove_spaces else " "
         trimmed = join_str.join(words).strip()
         
+        # Clean up multiple spaces that might have been introduced
+        trimmed = re.sub(r'\s+', ' ', trimmed)
+        
         if not remove_punctuation:
-            # remove spaces before punctuation
+            # Remove spaces before punctuation
             trimmed = re.sub(r"\s([?.!,:;])", r"\1", trimmed)
 
         return trimmed
