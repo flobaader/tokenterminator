@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
+from services.model_output_comparison import ModelOutputComparison
+
+#Inject Model Output Comparison Services
+def get_comparison_service():
+    return ModelOutputComparison()
 
 # Initialize the FastAPI app
 app = FastAPI()
