@@ -85,7 +85,6 @@ const mockApiCall = async (
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
-  const [optimizedPrompt, setOptimizedPrompt] = useState("");
   const [stats, setStats] = useState({ tokensSaved: 0, whSaved: 0 });
   const [removedWords, setRemovedWords] = useState<string[]>([]);
   const [showOptimized, setShowOptimized] = useState(false);
@@ -106,7 +105,6 @@ export default function Home() {
     try {
       const result = await mockApiCall(prompt);
       setResponse(result.response);
-      setOptimizedPrompt(result.optimizedPrompt);
       setStats({ tokensSaved: result.tokensSaved, whSaved: result.whSaved });
       setRemovedWords(result.removedWords);
     } catch (error) {
@@ -136,7 +134,7 @@ export default function Home() {
       <header className="bg-white dark:bg-gray-800 shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            TokenTerminator
+            <span className="text-5xl mr-2">✂️</span> TokenTerminator
           </h1>
         </div>
       </header>
@@ -147,14 +145,14 @@ export default function Home() {
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Enter your prompt</span>
+                  <span>📝 Enter your prompt</span>
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="show-optimized"
                       checked={showOptimized}
                       onCheckedChange={setShowOptimized}
                     />
-                    <Label htmlFor="show-optimized">Show Optimized</Label>
+                    <Label htmlFor="show-optimized">🔍 Show Optimized</Label>
                   </div>
                 </CardTitle>
               </CardHeader>
@@ -188,7 +186,7 @@ export default function Home() {
                     </div>
                   </div>
                   <Button type="submit" className="mt-4">
-                    Submit
+                    🚀 Submit
                   </Button>
                 </form>
               </CardContent>
@@ -196,34 +194,23 @@ export default function Home() {
 
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle>LLM Response</CardTitle>
+                <CardTitle>🤖 LLM Response</CardTitle>
               </CardHeader>
               <CardContent>
                 <p>{response || "Response will appear here"}</p>
               </CardContent>
             </Card>
-
-            {optimizedPrompt && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Optimized Prompt</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{optimizedPrompt}</p>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           <div className="w-1/3">
             <Card>
               <CardHeader>
-                <CardTitle>Optimization Statistics</CardTitle>
+                <CardTitle>📊 Optimization Statistics</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold">Tokens Saved</h3>
+                    <h3 className="font-semibold">🎟️ Tokens Saved</h3>
                     <p>
                       {stats.tokensSaved} (
                       {prompt.length > 0
@@ -236,11 +223,11 @@ export default function Home() {
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-semibold">Watt-hours Saved</h3>
+                    <h3 className="font-semibold">⚡ Watt-hours Saved</h3>
                     <p>{stats.whSaved.toFixed(4)} Wh</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold">Scaled for 100 Users</h3>
+                    <h3 className="font-semibold">👥 Scaled for 100 Users</h3>
                     <p>Tokens: {stats.tokensSaved * 100}</p>
                     <p>Watt-hours: {(stats.whSaved * 100).toFixed(2)} Wh</p>
                   </div>
