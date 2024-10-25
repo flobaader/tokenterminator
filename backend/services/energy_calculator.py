@@ -1,5 +1,5 @@
 class EnergyCalculator:
-    def __init__(self, watt_per_token: float = 0.0002, cost_per_token: float = 0.000002):
+    def __init__(self, watt_per_token: float = 0.0002, cost_per_token: float = 0.0000025):
         """
         Initialize the EnergyCalculator with a watt per token and cost per token.
         
