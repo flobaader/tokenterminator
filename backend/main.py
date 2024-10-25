@@ -87,7 +87,7 @@ async def analyze(
                   token_tracker: TokenTracker = Depends(get_token_tracker)):
     # Calculate similarity
     similarity_score_cosine = comparison_service.calculate_similarity(req.originalAnswer, req.optimizedAnswer)
-    similarity_score_gpt = comparison_service.gpt_similarity(req.prompt, req.originalAnswer, req.optimizedAnswer)
+    similarity_score_gpt = comparison_service.gpt_similarity(req.originalPrompt, req.originalAnswer, req.optimizedAnswer)
 
     # Calculate token counts and savings
     original_tokens = token_tracker.count_tokens(req.originalPrompt)
