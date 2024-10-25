@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { examplePrompts } from "@/lib/utils";
 import Image from "next/image";
 
@@ -96,6 +97,22 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
+  // New state variables for accumulative savings
+  const [totalTokensSaved, setTotalTokensSaved] = useState(0);
+  const [totalEnergySaved, setTotalEnergySaved] = useState(0);
+
+  // Updated state for the advertisement modal
+  const [showAd, setShowAd] = useState(false);
+
+  useEffect(() => {
+    // Show ad after 5 seconds
+    const showAdTimer = setTimeout(() => {
+      setShowAd(true);
+    }, 5000);
+
+    return () => clearTimeout(showAdTimer);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -117,6 +134,14 @@ export default function Home() {
         optimizedAnswer: optimizationResult.optimizedAnswer,
       });
       setAnalysisResponse(analysisResult);
+
+      // Update accumulative savings
+      const tokensSaved =
+        analysisResult.originalTokens - analysisResult.optimizedTokens;
+      setTotalTokensSaved((prevTotal) => prevTotal + tokensSaved);
+      setTotalEnergySaved(
+        (prevTotal) => prevTotal + analysisResult.energySavedWatts
+      );
     } catch (error) {
       console.error("Error:", error);
       toast.error("Error", { description: "Failed to process the prompt." });
@@ -164,6 +189,23 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
+      {/* Advertisement Modal */}
+      <Dialog open={showAd} onOpenChange={setShowAd}>
+        <DialogContent className="max-w-[80%] max-h-[80%] w-[80vw] h-[80vh] p-0 bg-red-500">
+          <div className="flex flex-col items-center justify-center h-full text-white">
+            <h2 className="text-4xl font-bold mb-4">Advertisement</h2>
+            <p className="text-xl mb-8">This is an advertisement.</p>
+            <Button
+              onClick={() => setShowAd(false)}
+              variant="outline"
+              className="text-white border-white hover:bg-red-600"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <header className="bg-white dark:bg-gray-800 shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -304,34 +346,26 @@ export default function Home() {
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold">🎟️ Tokens Saved</h3>
+                    <h3 className="font-semibold flex items-center">
+                      🎟️ Tokens Saved (Total)
+                      {optimizationResponse?.isCached && (
+                        <span className="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-[#147B58] text-white">
+                          Cached
+                        </span>
+                      )}
+                    </h3>
                     {isAnalyzing ? (
                       <Skeleton className="h-4 w-20" />
                     ) : (
-                      <p>
-                        {analysisResponse
-                          ? `${
-                              analysisResponse.originalTokens -
-                              analysisResponse.optimizedTokens
-                            } (${(
-                              ((analysisResponse.originalTokens -
-                                analysisResponse.optimizedTokens) /
-                                analysisResponse.originalTokens) *
-                              100
-                            ).toFixed(2)}%)`
-                          : "0 (0%)"}
-                      </p>
+                      <p>{totalTokensSaved}</p>
                     )}
                   </div>
                   <div>
-                    <h3 className="font-semibold"> Energy Saved</h3>
+                    <h3 className="font-semibold">⚡ Energy Saved (Total)</h3>
                     {isAnalyzing ? (
                       <Skeleton className="h-4 w-24" />
                     ) : (
-                      <p>
-                        {(analysisResponse?.energySavedWatts || 0).toFixed(4)}{" "}
-                        Wh
-                      </p>
+                      <p>{totalEnergySaved.toFixed(4)} Wh</p>
                     )}
                   </div>
                   <div>
@@ -373,18 +407,9 @@ export default function Home() {
                       </>
                     ) : (
                       <>
+                        <p>Tokens saved: {totalTokensSaved * 10000}</p>
                         <p>
-                          Tokens saved:{" "}
-                          {((analysisResponse?.originalTokens || 0) -
-                            (analysisResponse?.optimizedTokens || 0)) *
-                            10000}
-                        </p>
-                        <p>
-                          Energy:{" "}
-                          {(
-                            (analysisResponse?.energySavedWatts || 0) * 10000
-                          ).toFixed(2)}{" "}
-                          Wh
+                          Energy: {(totalEnergySaved * 10000).toFixed(2)} Wh
                         </p>
                       </>
                     )}
@@ -395,19 +420,13 @@ export default function Home() {
                     <span className="text-6xl">
                       {isAnalyzing
                         ? "⏳"
-                        : getEnergySavedVisualization(
-                            analysisResponse?.energySavedWatts || 0
-                          ).emoji}
+                        : getEnergySavedVisualization(totalEnergySaved).emoji}
                     </span>
                     {isAnalyzing ? (
                       <Skeleton className="h-4 w-32" />
                     ) : (
                       <span className="text-center">
-                        {
-                          getEnergySavedVisualization(
-                            analysisResponse?.energySavedWatts || 0
-                          ).text
-                        }
+                        {getEnergySavedVisualization(totalEnergySaved).text}
                       </span>
                     )}
                   </div>
