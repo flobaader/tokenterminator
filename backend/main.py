@@ -55,12 +55,9 @@ class AnalysisResponse(BaseModel):
     similarityScoreGPT: float
     originalTokens: int
     optimizedTokens: int
-   # tokenSavings: int
-   # tokenSavingsPercentage: float
     energySavedWatts: float
     costSavedDollars: float
     
-
 
 # Define request model
 class PromptRequest(BaseModel):
@@ -123,7 +120,7 @@ async def analyze(
                   cache_service: CacheService = Depends(get_cache_service)):
     
         # Check cache for existing analysis
-    cache_result = cache_service.check_cache(req.originalPrompt)
+    cache_result = await cache_service.check_cache(req.originalPrompt)
 
     if cache_result.cached:
         
