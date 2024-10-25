@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
-from services.llm_service.py import LLMInteractionService
+from services.llm_service import LLMInteractionService
 from services.model_output_comparison import ModelOutputComparison
 
 #load OpenAI API key from .env
@@ -45,3 +45,8 @@ async def optimize_prompt(prompt: Optional[str] = "Example prompt"):
     print("test")
     return response
 
+
+# generate a test post endpoint
+@app.post("/test")
+async def test(text: Optional[str] = "Example text"):
+    return {"message": text}
