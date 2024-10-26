@@ -101,9 +101,9 @@ export default function Home() {
   const [totalTokensSaved, setTotalTokensSaved] = useState(0);
   const [totalEnergySaved, setTotalEnergySaved] = useState(0);
 
-  // Updated state for the advertisement modal
+  // Updated state for the advertisement modal and prompt count
   const [showAd, setShowAd] = useState(false);
-  const [hasSubmittedPrompt, setHasSubmittedPrompt] = useState(false);
+  const [promptCount, setPromptCount] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,10 +113,13 @@ export default function Home() {
       description: "Your prompt is being optimized.",
     });
 
-    // Show the ad if this is the first prompt submission
-    if (!hasSubmittedPrompt) {
+    // Increment the prompt count
+    const newPromptCount = promptCount + 1;
+    setPromptCount(newPromptCount);
+
+    // Show the ad if this is the third prompt submission
+    if (newPromptCount === 3) {
       setShowAd(true);
-      setHasSubmittedPrompt(true);
     }
 
     try {
