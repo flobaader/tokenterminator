@@ -11,25 +11,31 @@ from services.token_tracker import TokenTracker
 from services.energy_calculator import EnergyCalculator
 from services.cache import CacheService
 
-#load OpenAI API key from .env
+# load OpenAI API key from .env
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
-#Inject Services
+
+# Inject Services
 def get_llm_service():
     return LLMInteractionService(api_key=api_key)
+
 
 def get_comparison_service():
     return ModelOutputComparison()
 
+
 def get_token_tracker():
     return TokenTracker()
+
 
 def get_energy_calculator():
     return EnergyCalculator()
 
+
 def get_cache_service():
     return CacheService()
+
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -37,11 +43,15 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://tokenterminator.deploy.selectcode.dev", "http://localhost:3000"],
+    allow_origins=[
+        "https://tokenterminator.deploy.selectcode.dev",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
 
 # Define response model
 class GreenGPTResponse(BaseModel):
@@ -49,6 +59,7 @@ class GreenGPTResponse(BaseModel):
     optimizedAnswer: str
     originalAnswer: str
     isCached: bool = False
+
 
 class AnalysisResponse(BaseModel):
     similarityScoreCosine: float  # Assume a similarity score (0 to 1)
@@ -59,7 +70,7 @@ class AnalysisResponse(BaseModel):
     tokenSavingsPercentage: float
     energySavedWatts: float
     costSavedDollars: float
-    
+
 
 # Define request model
 class PromptRequest(BaseModel):
@@ -72,65 +83,73 @@ class AnalyzePromptRequest(BaseModel):
     optimizedPrompt: str = "Optimzed prompt"
     originalAnswer: str = "Original Answer"
     optimizedAnswer: str = "Optimized Answer"
-    
+
 
 # Sample endpoint that returns the JSON
 @app.post("/optimize-prompt", response_model=GreenGPTResponse)
 async def optimize_prompt(
     request: PromptRequest,
     llm_service: LLMInteractionService = Depends(get_llm_service),
-    cache_service: CacheService = Depends(get_cache_service)
+    cache_service: CacheService = Depends(get_cache_service),
 ):
     result = await cache_service.check_cache(request.prompt)
-    if result.cached:
+    if result.cached and False:  # disable caching for now
         response = GreenGPTResponse(
-        optimizedPrompt= "None",
-        optimizedAnswer= result.answer,
-        originalAnswer= "None",
-        isCached = True
+            optimizedPrompt="None",
+            optimizedAnswer=result.answer,
+            originalAnswer="None",
+            isCached=True,
         )
         return response
-    
+
     AI_COMPRESS = False
     if AI_COMPRESS:
         from services.prompt_trimmer2 import trim
+
         trimmed_prompt = trim(request.prompt)
     else:
         processor = TextProcessor()
         trimmed_prompt = processor.trim(request.prompt)
 
-    
     original_answer, optimized_answer = await asyncio.gather(
-        llm_service.get_answer(request.prompt),
-        llm_service.get_answer(trimmed_prompt)
+        llm_service.get_answer(request.prompt), llm_service.get_answer(trimmed_prompt)
     )
 
     cache_service.save_cache(request.prompt, optimized_answer)
 
     response = GreenGPTResponse(
-        optimizedPrompt= trimmed_prompt,
+        optimizedPrompt=trimmed_prompt,
         optimizedAnswer=optimized_answer,
         originalAnswer=original_answer,
-        isCached = False
+        isCached=False,
     )
     return response
 
+
 @app.post("/analyze", response_model=AnalysisResponse)
 async def analyze(
-                req: AnalyzePromptRequest,
-                  comparison_service: ModelOutputComparison = Depends(get_comparison_service),
-                  token_tracker: TokenTracker = Depends(get_token_tracker),
-                  energy_calculator: EnergyCalculator = Depends(get_energy_calculator)):
-    
+    req: AnalyzePromptRequest,
+    comparison_service: ModelOutputComparison = Depends(get_comparison_service),
+    token_tracker: TokenTracker = Depends(get_token_tracker),
+    energy_calculator: EnergyCalculator = Depends(get_energy_calculator),
+):
 
     # Calculate similarity
-    similarity_score_cosine = comparison_service.calculate_similarity(req.originalAnswer, req.optimizedAnswer)
-    similarity_score_gpt = comparison_service.gpt_similarity(req.originalPrompt, req.originalAnswer, req.optimizedAnswer)
+    similarity_score_cosine = comparison_service.calculate_similarity(
+        req.originalAnswer, req.optimizedAnswer
+    )
+    similarity_score_gpt = comparison_service.gpt_similarity(
+        req.originalPrompt, req.originalAnswer, req.optimizedAnswer
+    )
     # Calculate token counts and savings
     original_tokens = token_tracker.count_tokens(req.originalPrompt)
     optimized_tokens = token_tracker.count_tokens(req.optimizedPrompt)
-    token_savings = token_tracker.optimized_tokens(req.originalPrompt, req.optimizedPrompt)
-    token_savings_percentage = token_tracker.calculate_token_savings_percentage(req.originalPrompt, req.optimizedPrompt)
+    token_savings = token_tracker.optimized_tokens(
+        req.originalPrompt, req.optimizedPrompt
+    )
+    token_savings_percentage = token_tracker.calculate_token_savings_percentage(
+        req.originalPrompt, req.optimizedPrompt
+    )
     # Calculate energy and cost savings
     energy_saved_watts = energy_calculator.calculate_energy_saving(token_savings)
     cost_saved_dollars = energy_calculator.calculate_cost_saving(token_savings)
@@ -148,8 +167,8 @@ async def analyze(
             tokenSavings=token_savings,
             tokenSavingsPercentage=token_savings_percentage,
             energySavedWatts=energy_saved_watts,
-            costSavedDollars=cost_saved_dollars
-        ) 
+            costSavedDollars=cost_saved_dollars,
+        )
 
     response = AnalysisResponse(
         similarityScoreCosine=similarity_score_cosine,
@@ -159,27 +178,24 @@ async def analyze(
         tokenSavings=token_savings,
         tokenSavingsPercentage=token_savings_percentage,
         energySavedWatts=energy_saved_watts,
-        costSavedDollars=cost_saved_dollars
+        costSavedDollars=cost_saved_dollars,
     )
     return response
 
 
-
 @app.post("/test")
 async def test_cache(
-    request: PromptRequest,
-    cache_service: CacheService = Depends(get_cache_service)
+    request: PromptRequest, cache_service: CacheService = Depends(get_cache_service)
 ):
     result = await cache_service.check_cache(request.prompt)
     test_answer = f"This is a test answer for: {request.prompt}"
     cache_service.save_cache(request.prompt, test_answer)
-    
+
     return {"querry": request.prompt, "answer": result.answer, "cached": result.cached}
 
+
 @app.delete("/cache")
-async def delete_cache(
-    cache_service: CacheService = Depends(get_cache_service)
-):
+async def delete_cache(cache_service: CacheService = Depends(get_cache_service)):
     """Delete all entries from the cache"""
     cache_service.clear_cache()
     return {"message": "Cache cleared successfully"}

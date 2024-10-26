@@ -10,7 +10,7 @@ export const examplePrompts = [
     name: "BCG Wikipedia Summarization",
     prompt: `
 summarize this:
-Boston Consulting Group, Inc. (BCG) is an American global management consulting firm founded in 1963 and headquartered in Boston, Massachusetts.[3] It is one of the "Big Three" (or MBB, the world's three largest management consulting firms by revenue) along with McKinsey & Company and Bain & Company. Since 2021, BCG has been led by the German executive Christoph Schweizer.[4][5][6]
+Boston Consulting Group, Inc. (BCG) is an American global management consulting firm founded in 1963 and headquartered in Boston, Massachusetts.[3] It is one of the Big Three (or MBB, the world's three largest management consulting firms by revenue) along with McKinsey & Company and Bain & Company. Since 2021, BCG has been led by the German executive Christoph Schweizer.[4][5][6]
 
 History
 The firm was founded in 1963 as part of The Boston Safe Deposit and Trust Company. Bruce Henderson had been recruited from Arthur D. Little to establish the consulting arm operating as a subsidiary under the name Management and Consulting Division of the Boston Safe Deposit and Trust Company. Initially the division only advised clients of the bank, with billings for the first month at just US$500. Henderson hired his second consultant, Arthur P. Contas, in December 1963.[7] In 1966, BCG opened its second office in Tokyo, Japan.[8]
@@ -23,7 +23,7 @@ In the 1980s, BCG introduced the concept of time-based competition that reconsid
 
 In May 2021, the firm elected Christoph Schweizer as CEO, replacing Rich Lesser who would step down and serve as the firm's Global Chair. [14]
 
-In 2022, Boston Consulting Group released its "2022 Annual Sustainability Report" highlighting numerous initiatives focused on societal and planetary impact. Since 2015, the progress in numbers is 30% less greenhouse gas emissions, 20% less water usage, 15% less waste generation, and 10% less energy consumption. [15]
+In 2022, Boston Consulting Group released its 2022 Annual Sustainability Report highlighting numerous initiatives focused on societal and planetary impact. Since 2015, the progress in numbers is 30% less greenhouse gas emissions, 20% less water usage, 15% less waste generation, and 10% less energy consumption. [15]
 
 Recruiting
 BCG typically hires for an associate or a consultant position, recruiting from top undergraduate colleges, advanced degree programs and business schools.[16]
@@ -32,7 +32,7 @@ BCG growth-share matrix
 Main article: Growth–share matrix
 
 The BCG growth-share matrix
-In the 1970s, BCG created and popularized the "growth–share matrix," a chart to help large corporations decide how to allocate cash among their business units. The corporation would categorize its business units as "Stars," "Cash Cows," "Question Marks," or "Dogs," and then allocate cash accordingly, moving money from "Cash Cows" toward "Stars" and "Question Marks," which have higher market growth rates and hence greater upside potential.[17]
+In the 1970s, BCG created and popularized the growth–share matrix, a chart to help large corporations decide how to allocate cash among their business units. The corporation would categorize its business units as Stars, Cash Cows, Question Marks, or Dogs, and then allocate cash accordingly, moving money from Cash Cows toward Stars and Question Marks, which have higher market growth rates and hence greater upside potential.[17]
 
 BCG extended business units
 BCG X
@@ -65,7 +65,7 @@ Sweden
 Boston Consulting Group has received criticism for its involvement in the construction of the New Karolinska Solna University Hospital after an investigation by Dagens Nyheter. Specifically, the potential conflict of interest where a former BCG employee and then hospital executive approved numerous expenses without proper receipts and the high cost paid for external consultants including BCG.[33] In the investigative journalism book Konsulterna - Kampen om Karolinska (roughly The Consultants - The Struggle for the Karolinska University Hospital), the authors and Dagens Nyheter journalists Anna Gustavsson and Lisa Röstlund argue that the value-based health care model as recommended by BCG had not been properly investigated and have resulted in an exponential growth in administration and lack of responsibility for patients.[34]
 
 United States
-In 2022, BCG filed a lawsuit against GameStop as the latter allegedly denied payment of fee worth $30 million for a project. GameStop argued that it saw it is in the best interest of its stakeholders to deny payment as BCG brought little improvement to the EBITDA of the company, which the consultancy allegedly promised to improve. BCG counter argued that the company has delivered more than it promised in statement of proposal and that the quoted variable fee was based on the "projected," not realized, improvement in EBITDA, as per the contract. [35] On July 30, 2024 the suit was concluded in a joint dismissal. [36]
+In 2022, BCG filed a lawsuit against GameStop as the latter allegedly denied payment of fee worth $30 million for a project. GameStop argued that it saw it is in the best interest of its stakeholders to deny payment as BCG brought little improvement to the EBITDA of the company, which the consultancy allegedly promised to improve. BCG counter argued that the company has delivered more than it promised in statement of proposal and that the quoted variable fee was based on the projected, not realized, improvement in EBITDA, as per the contract. [35] On July 30, 2024 the suit was concluded in a joint dismissal. [36]
     `,
   },
   {
