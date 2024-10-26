@@ -81,7 +81,7 @@ const getEnergySavedVisualization = (energySaved: number) => {
   } else {
     return {
       emoji: "💡",
-      text: `${hoursWith6WBulb.toFixed(1)} hours of a 6W LED bulb`,
+      text: `${hoursWith6WBulb.toFixed(1)} hours of a LED bulb`,
     };
   }
 };
@@ -345,6 +345,30 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
+                  {/* New section for tokens saved in this message */}
+                  <div>
+                    <h3 className="font-semibold">🎟️ Tokens Saved</h3>
+                    {isAnalyzing ? (
+                      <Skeleton className="h-4 w-20" />
+                    ) : analysisResponse ? (
+                      <p>
+                        {analysisResponse.originalTokens -
+                          analysisResponse.optimizedTokens}{" "}
+                        (
+                        {(
+                          ((analysisResponse.originalTokens -
+                            analysisResponse.optimizedTokens) /
+                            analysisResponse.originalTokens) *
+                          100
+                        ).toFixed(2)}
+                        %)
+                      </p>
+                    ) : (
+                      <p>0 (0%)</p>
+                    )}
+                  </div>
+
+                  {/* Existing total tokens saved section */}
                   <div>
                     <h3 className="font-semibold flex items-center">
                       🎟️ Tokens Saved (Total)
