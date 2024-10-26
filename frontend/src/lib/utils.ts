@@ -8,8 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export const examplePrompts = [
   {
     name: "BCG Wikipedia Summarization",
-    prompt: `
-summarize this:
+    prompt: `summarize this:
 Boston Consulting Group, Inc. (BCG) is an American global management consulting firm founded in 1963 and headquartered in Boston, Massachusetts.[3] It is one of the Big Three (or MBB, the world's three largest management consulting firms by revenue) along with McKinsey & Company and Bain & Company. Since 2021, BCG has been led by the German executive Christoph Schweizer.[4][5][6]
 
 History
@@ -69,20 +68,82 @@ In 2022, BCG filed a lawsuit against GameStop as the latter allegedly denied pay
     `,
   },
   {
-    name: "RAG Use Case",
-    prompt: `
-You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don’t know the answer, just say that you don’t know. Use three sentences maximum and keep the answer concise.
-Question: How old is the Boston Consulting Group?
-Context: <context>
-- The Boston Consulting Group was founded in 1963.
-- The Boston Consulting Group is a US-American consulting firm.
-- The Boston Consulting Group has more than 100 offices in over 50 countries.
-- The Boston Consulting Group is a strategy consulting firm.
-- The Boston Consulting Group has more than 100 offices in over 50 countries.
-- The Boston Consulting Group is a full-service consulting firm.
-- The Boston Consulting Group is a private company.
-</context>
-Answer:
+    name: "Email Chain Summarization",
+    prompt: `summarise this email chain for me:
+---
+**Subject:** Country-Specific Mappings for Google Shopping
+---
+**John Lee** <john.lee@codedynamics.com>
+**Mon, Sept 23, 22:18**
+To: **Jake Harris** <jake.harris@bordtech.com>, **Mike Daniels** <mike.daniels@bordtech.com>, **me**
+Hi Mike, hi Jake,
+Thank you for your honest feedback.
+I completely understand your frustration, and I must say that I am equally disappointed that the results did not meet your expectations. In our company's history, this is the first time a project has gone in this direction.
+The initial evaluation of Price API with SP Lab looked very promising, so we were confident it would be equally successful for you. It’s even more frustrating that this expectation wasn’t fulfilled. We will discontinue our collaboration with Price API immediately on this project.
+We place great value on your satisfaction and want to offer you additional benefits. After careful consideration, we believe the best way to support you is by assisting with the further introduction of AI.
+Following discussions with Oliver, we have two options to propose:
+1. A refund of the remaining balance of $1,200.
+2. Ten hours of free AI consulting (valued at $1,800), which can also be conducted on-site if you prefer.
+Let’s discuss this calmly after tomorrow’s AI workshop.
+Best regards,
+**John**
+---
+**John Lee**
+Co-Founder | Head of People & Culture
+CodeDynamics LLC
+123 Main Street
+San Mateo, CA 94401
++1 (415) 555-0135
+john.lee@codedynamics.com
+[www.codedynamics.com](http://www.codedynamics.com)
+---
+**Jake Harris** <jake.harris@bordtech.com>
+**Mon, Sept 23, 11:50**
+To: **John Lee** <john.lee@codedynamics.com>
+Cc: **Mike Daniels** <mike.daniels@bordtech.com>
+Hi John,
+Thanks for the response.
+We’ve invested a lot of time and money, always holding onto the hope that the error was on our end. Now that all products are listed in the free entries and there’s still no valid data from Price API, I have to end the project here. The disappointing results don’t even remotely match the expectations set at the beginning, making this project a total miss.
+I know you’re as frustrated with the data quality as we are, and I feel that the responsibility for this lies with Robert and the Price API service.
+If you have any other suggestions on how to get reliable pricing data, maybe we can find a way to collaborate again in the future.
+Best regards,
+Jake
+---
+**John Lee** <john.lee@codedynamics.com>
+**Mon, Sept 23, 11:18**
+To: **Jake Harris** <jake.harris@bordtech.com>
+Cc: **Mike Daniels** <mike.daniels@bordtech.com>
+Hi Jake,
+Apologies for the late response – I was fully booked on Thursday and Friday.
+On Wednesday, we conducted the scrape for AeroGear. The results were, unfortunately, underwhelming, and I’ve attached them for you.
+The most relevant findings are here:
+The coverage has slightly improved, but still, only around 23% of the products were found. There was an average of 1.3 offers per product (out of 1,245 offers for 986 found products), including your entries.
+A quick manual search showed that many available Google Shopping offers were missed by Price API.
+I’m now fully in favor of ending our work with Price API. It’s frustrating that it’s been so ineffective.
+We are exploring alternative solutions and will keep you updated.
+Best,
+John
+---
+**Jake Harris** <jake.harris@bordtech.com>
+**Wed, Sept 18, 16:13**
+To: **John Lee** <john.lee@codedynamics.com>
+Hey John,
+The data in the feed and export for this mapping are solely for AeroGear.
+Go ahead with the scrape for AeroGear so we can assess the coverage and quality.
+Best regards,
+Jake
+---
+**Mike Daniels** <mike.daniels@bordtech.com>
+**Tue, Sept 24, 09:30**
+To: **John Lee** <john.lee@codedynamics.com>, **Jake Harris** <jake.harris@bordtech.com>, **me**
+Hello everyone,
+I have a third proposal! :-)
+We absolutely need a price monitoring tool – there’s no way around it for us at B&T.
+I suggest we take another look at other "Pricing Optimization Software" options, like those on [Capterra](https://www.capterra.com/pricing-optimization-software/?features=ae17b9c0-e5fd-480d-a161-0d363297e5f1).
+What we definitely want, and you’ve already achieved, is output in a table format by country and category. So let’s not throw in the towel too quickly. PriceWatcher, our previous provider, offers an API that could help pull data in table form.
+Best,
+**Mike Daniels**
+Head of E-Commerce
     `,
   },
   {
@@ -91,11 +152,11 @@ Answer:
 System: You are a helpful assistant. Help the user with their questions.
 User: What is the weather in Tokyo?
 Assistant: The weather in Tokyo is currently sunny with a temperature of 22°C.
-User: What is the weather in Tokyo?
-Assistant: The weather in Tokyo is currently sunny with a temperature of 22°C.
-User: What is the weather in Tokyo?
-Assistant: The weather in Tokyo is currently sunny with a temperature of 22°C.
-User: What is the weather in Tokyo?
+User: I am travelling to Tokyo next week, what should I pack?
+Assistant: You should pack a light jacket and comfortable shoes. You should prepare for rain as it is common in Tokyo.
+User: What are the best places to visit in Tokyo? I am travelling with my family.
+Assistant: You should visit the Tokyo Tower and the Senso-ji Temple they are both very popular with families.
+User: How much time should I allow for my trip and the locations you recommended?
     `,
   },
 ];

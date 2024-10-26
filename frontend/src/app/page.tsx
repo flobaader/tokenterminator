@@ -105,6 +105,8 @@ export default function Home() {
   const [showAd, setShowAd] = useState(false);
   const [promptCount, setPromptCount] = useState(0);
 
+  const [showDemo, setShowDemo] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -117,8 +119,8 @@ export default function Home() {
     const newPromptCount = promptCount + 1;
     setPromptCount(newPromptCount);
 
-    // Show the ad if this is the third prompt submission
-    if (newPromptCount === 3) {
+    // Show the ad if this is the second prompt submission
+    if (newPromptCount === 2) {
       setShowAd(true);
     }
 
@@ -187,6 +189,19 @@ export default function Home() {
       );
     });
   };
+
+  if (!showDemo) {
+    return (
+      <div className="fixed inset-0 bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center">
+        <h1 className="text-6xl font-bold mb-8 flex items-center">
+          <span className="text-7xl mr-4">✂️</span> TokenTerminator
+        </h1>
+        <Button size="lg" onClick={() => setShowDemo(true)}>
+          Go to Demo
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
@@ -342,7 +357,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* New section for tokens saved in this message */}
+                  {/* Per-prompt statistics */}
                   <div>
                     <h3 className="font-semibold">🎟️ Tokens Saved</h3>
                     {isAnalyzing ? (
@@ -365,30 +380,6 @@ export default function Home() {
                     )}
                   </div>
 
-                  {/* Existing total tokens saved section */}
-                  <div>
-                    <h3 className="font-semibold flex items-center">
-                      🎟️ Tokens Saved (Total)
-                      {optimizationResponse?.isCached && (
-                        <span className="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-[#147B58] text-white">
-                          Cached
-                        </span>
-                      )}
-                    </h3>
-                    {isAnalyzing ? (
-                      <Skeleton className="h-4 w-20" />
-                    ) : (
-                      <p>{totalTokensSaved}</p>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">⚡ Energy Saved (Total)</h3>
-                    {isAnalyzing ? (
-                      <Skeleton className="h-4 w-24" />
-                    ) : (
-                      <p>{totalEnergySaved.toFixed(4)} Wh</p>
-                    )}
-                  </div>
                   <div>
                     <h3 className="font-semibold">
                       🎯 Similarity Score (Cosine)
@@ -417,6 +408,26 @@ export default function Home() {
                       </p>
                     )}
                   </div>
+
+                  {/* Accumulated and scaled statistics */}
+                  <div>
+                    <h3 className="font-semibold">🎟️ Tokens Saved (Total)</h3>
+                    {isAnalyzing ? (
+                      <Skeleton className="h-4 w-20" />
+                    ) : (
+                      <p>{totalTokensSaved}</p>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">⚡ Energy Saved (Total)</h3>
+                    {isAnalyzing ? (
+                      <Skeleton className="h-4 w-24" />
+                    ) : (
+                      <p>{totalEnergySaved.toFixed(4)} Wh</p>
+                    )}
+                  </div>
+                  {/* Horizontal line */}
+                  <hr className="border-t border-gray-300 dark:border-gray-700 my-4" />
                   <div>
                     <h3 className="font-semibold">
                       👥 Scaled for 10000 Prompts
