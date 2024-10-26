@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export const examplePrompts = [
   {
-    name: "BCG Wikipedia Summarization",
+    name: "Article Summarization",
     prompt: `summarize this:
 Boston Consulting Group, Inc. (BCG) is an American global management consulting firm founded in 1963 and headquartered in Boston, Massachusetts.[3] It is one of the Big Three (or MBB, the world's three largest management consulting firms by revenue) along with McKinsey & Company and Bain & Company. Since 2021, BCG has been led by the German executive Christoph Schweizer.[4][5][6]
 
@@ -70,8 +70,7 @@ In 2022, BCG filed a lawsuit against GameStop as the latter allegedly denied pay
   {
     name: "Email Chain Summarization",
     prompt: `summarise this email chain for me:
----
-**Subject:** Country-Specific Mappings for Google Shopping
+    **Subject:** Country-Specific Mappings for Google Shopping
 ---
 **John Lee** <john.lee@codedynamics.com>
 **Mon, Sept 23, 22:18**
@@ -147,9 +146,8 @@ Head of E-Commerce
     `,
   },
   {
-    name: "Chatbot Use Case",
-    prompt: `
-System: You are a helpful assistant. Help the user with their questions.
+    name: "Chatbot with History",
+    prompt: `System: You are a helpful assistant. Help the user with their questions.
 User: What is the weather in Tokyo?
 Assistant: The weather in Tokyo is currently sunny with a temperature of 22°C.
 User: I am travelling to Tokyo next week, what should I pack?
@@ -157,6 +155,48 @@ Assistant: You should pack a light jacket and comfortable shoes. You should prep
 User: What are the best places to visit in Tokyo? I am travelling with my family.
 Assistant: You should visit the Tokyo Tower and the Senso-ji Temple they are both very popular with families.
 User: How much time should I allow for my trip and the locations you recommended?
+    `,
+  },
+  {
+    name: "Code Review",
+    prompt: `I have written a function in Python that calculates the factorial of a given number using recursion. However, I am concerned about the efficiency and potential issues when handling large numbers. Could you review my code, point out any inefficiencies or improvements I could make, and suggest alternatives if necessary? Additionally, please check for any best practices or coding standards that I might have overlooked. Here is the code:
+    def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n - 1)
+    Specifically, I’m interested in understanding:
+
+	•	If recursion is the best approach for this problem, and if not, what would be a better alternative.
+	•	Whether there are any edge cases my code might fail to handle.
+	•	Any improvements I could make to enhance readability or performance.”
+    `,
+  },
+  {
+    name: "Code Generation",
+    prompt: `I’m working on a web application using React and TypeScript. I need to create a reusable component for a dropdown menu that supports dynamic options and includes basic accessibility features (like keyboard navigation and ARIA roles). The component should accept an array of options as props and render them in a dropdown format. It should also allow users to select an option using both mouse clicks and keyboard arrows.
+
+Could you generate the code for this dropdown component? Make sure the code follows TypeScript best practices and includes comments explaining the important parts. Additionally, if possible, provide a small CSS snippet for styling the dropdown, ensuring that it is both visually appealing and responsive.
+    `,
+  },
+  {
+    name: "Translation",
+    prompt: `I have an English paragraph that needs to be translated into French for an official document. The translation should maintain a formal tone and be as accurate as possible, retaining the original meaning while adapting to cultural and linguistic nuances. Here’s the paragraph:
+
+‘Our company is committed to delivering high-quality products that meet international standards. We continuously strive to innovate and improve our processes to better serve our clients and maintain our position as a leader in the industry. Transparency, sustainability, and excellence are the core values that guide our operations.’
+
+Please provide the French translation, and also highlight any cultural considerations or adjustments made during the translation process.
+    `,
+  },
+  {
+    name: "Question Answering",
+    prompt: `I’m researching the impact of climate change on polar bear populations, and I have some specific questions. Could you help answer them based on the latest scientific studies and data? Here are the questions:
+
+	1.	How has the shrinking of sea ice affected the hunting patterns and habitat of polar bears?
+	2.	What are the main threats to polar bear survival apart from habitat loss, and how are conservation efforts addressing these challenges?
+	3.	Are there any recent findings on polar bear adaptation to changing conditions, such as shifts in diet or behavior?
+
+Please provide detailed answers, referencing any relevant studies or data sources. I am particularly interested in information from the past five years, focusing on the Arctic region.
     `,
   },
 ];
