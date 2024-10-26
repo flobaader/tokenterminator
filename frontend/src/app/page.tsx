@@ -103,15 +103,7 @@ export default function Home() {
 
   // Updated state for the advertisement modal
   const [showAd, setShowAd] = useState(false);
-
-  useEffect(() => {
-    // Show ad after 5 seconds
-    const showAdTimer = setTimeout(() => {
-      setShowAd(true);
-    }, 5000);
-
-    return () => clearTimeout(showAdTimer);
-  }, []);
+  const [hasSubmittedPrompt, setHasSubmittedPrompt] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,6 +112,12 @@ export default function Home() {
     toast("Prompt submitted", {
       description: "Your prompt is being optimized.",
     });
+
+    // Show the ad if this is the first prompt submission
+    if (!hasSubmittedPrompt) {
+      setShowAd(true);
+      setHasSubmittedPrompt(true);
+    }
 
     try {
       const optimizationResult = await optimizePrompt(prompt);
@@ -191,18 +189,14 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
       {/* Advertisement Modal */}
       <Dialog open={showAd} onOpenChange={setShowAd}>
-        <DialogContent className="max-w-[80%] max-h-[80%] w-[80vw] h-[80vh] p-0 bg-red-500">
-          <div className="flex flex-col items-center justify-center h-full text-white">
-            <h2 className="text-4xl font-bold mb-4">Advertisement</h2>
-            <p className="text-xl mb-8">This is an advertisement.</p>
-            <Button
-              onClick={() => setShowAd(false)}
-              variant="outline"
-              className="text-white border-white hover:bg-red-600"
-            >
-              Close
-            </Button>
-          </div>
+        <DialogContent className="p-0 max-w-none w-auto h-auto">
+          <Image
+            src="/advertisement.png"
+            alt="Advertisement"
+            width={1500}
+            height={900}
+            objectFit="contain"
+          />
         </DialogContent>
       </Dialog>
 

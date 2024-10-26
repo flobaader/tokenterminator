@@ -1,22 +1,23 @@
+# Use an official Node runtime as the base image
 FROM node:18-alpine
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package files
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
-# Copy the rest of the code
+# Copy the rest of the application code
 COPY . .
 
-# Expose port 3000 for Next.js
+# Build the Next.js application
+RUN npm run build
+
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Start the development server with debugging enabled
-CMD ["npm", "run", "dev"]
-
-# Enable hot reload by setting environment variable
-ENV WATCHPACK_POLLING=true
+# Start the application in production mode
+CMD ["npm", "start"]
